@@ -1,0 +1,21 @@
+{
+  "name": "skripsi-login",
+  "version": "1.0.0",
+  "description": "Login page untuk pretest skripsi dengan Google Authentication",
+  "main": "script.js",
+  "scripts": {
+    "dev": "npx serve . -l 3000",
+    "start": "npx serve .",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "keywords": [
+    "login",
+    "google-auth",
+    "skripsi"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

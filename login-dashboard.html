@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaundryKu - Dashboard</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+        
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6C13.66,6 15,7.34 15,9C15,10.66 13.66,12 12,12C10.34,12 9,10.66 9,9C9,7.34 10.34,6 12,6M12,14C14.97,14 17.39,15.55 18.66,17.82L15.33,19.69C14.67,18.53 13.44,17.75 12,17.75C10.56,17.75 9.33,18.53 8.67,19.69L5.33,17.82C6.61,15.55 9.03,14 12,14M12,16C10.06,16 8.5,17.06 8.5,18.5H15.5C15.5,17.06 13.94,16 12,16Z" />
+                            </svg>
+                        </div>
+                        <span class="logo-text">LaundryQu</span>
+                    </div>
+                    <h2 class="welcome-text">Dashboard</h2>
+                    <p class="subtitle-text">Pilih menu untuk melanjutkan</p>
+                </div>
+                
+                <div class="dashboard-menu">
+                    <button class="dashboard-btn" onclick="navigate('new-order')">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                        </svg>
+                        <span>Buat Pesanan Baru</span>
+                    </button>
+                    
+                    <button class="dashboard-btn" onclick="navigate('my-orders')">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" />
+                        </svg>
+                        <span>Pesanan Saya</span>
+                    </button>
+                    
+                    <button class="dashboard-btn" onclick="navigate('status')">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12,20A8,8 0 0,1 4,12C4,7.59 7.05,4.06 11,3.02V9.02C7.98,9.69 5.93,11.98 5.93,15A8,8 0 0,0 13.93,19.97L14,20H12M12,2A10,10 0 0,1 22,12C22,16.27 19.15,19.75 15.22,20.95C14.73,21.09 14.21,20.88 13.93,20.46C13.66,20.05 13.74,19.54 14.11,19.19C14.5,18.82 14.98,18.56 15.5,18.43C19.05,17.63 21.55,14.42 21.55,11A10,10 0 0,0 11,1C8.59,1 6.41,2.18 4.95,3.98C3.83,5.32 3,7.19 3,9.23C3,12.25 4.52,14.94 6.9,16.73L5.36,18.27C3.08,16.14 1.64,13.21 1.64,10C1.64,5.36 5.36,1.64 10,1.64C12.3,1.64 14.37,2.6 15.92,4.14C16.82,5.04 17.5,6.14 17.93,7.39H20.68C19.78,5.92 18.52,4.65 17,3.62C13.94,1.63 10.26,1.63 7.2,3.62L12,2Z" />
+                        </svg>
+                        <span>Status Cucian</span>
+                    </button>
+                    
+                    <button class="dashboard-btn" onclick="navigate('profile')">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12,12C14.76,12 17,9.76 17,7C17,4.24 14.76,2 12,2C9.24,2 7,4.24 7,7C7,9.76 9.24,12 12,12M12,14C9.33,14 4,15.34 4,18V20H20V18C20,15.34 14.67,14 12,14Z" />
+                        </svg>
+                        <span>Profile</span>
+                    </button>
+                </div>
+                
+                <button class="logout-btn" onclick="logout()">Keluar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigate(page) {
+            alert('Navigating to: ' + page);
+        }
+        
+        function logout() {
+            localStorage.removeItem('laundryUser');
+            window.location.href = 'index.html';
+        }
+        
+        // Check login status
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedUser = localStorage.getItem('laundryUser');
+            if (!storedUser) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
