@@ -22,7 +22,15 @@ togglePasswordBtn.addEventListener('click', function() {
 });
 
 // ============================================
-// 2. Login Form Submit
+// 2. Demo Credentials
+// ============================================
+const DEMO_CREDENTIALS = {
+    email: 'demo',
+    password: 'demo'
+};
+
+// ============================================
+// 3. Login Form Submit
 // ============================================
 loginForm.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -35,8 +43,24 @@ loginForm.addEventListener('submit', function(e) {
         return;
     }
     
+    // Demo login
+    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+        setLoading(true);
+        showMessage('Demo login berhasil! Selamat datang.', 'success');
+        localStorage.setItem('laundryUser', JSON.stringify({ 
+            email: email, 
+            name: 'Demo User',
+            isLoggedIn: true,
+            method: 'demo'
+        }));
+        setTimeout(function() { 
+            window.location.href = 'login-dashboard.html'; 
+        }, 1000);
+        return;
+    }
+    
     if (!isValidEmail(email)) {
-        showMessage('Email tidak valid', 'error');
+        showMessage('Email tidak valid. Gunakan demo/demo untuk demo login.', 'error');
         return;
     }
     
@@ -47,27 +71,27 @@ loginForm.addEventListener('submit', function(e) {
         setLoading(false);
         showMessage('Login berhasil! Selamat datang.', 'success');
         localStorage.setItem('laundryUser', JSON.stringify({ email: email, isLoggedIn: true }));
-        setTimeout(function() { window.location.href = 'login-dashboard.html'; }, 1500);
+        setTimeout(function() { 
+            window.location.href = 'login-dashboard.html'; 
+        }, 1500);
     }, 1500);
 });
 
 // ============================================
-// 3. Google Login Button - DIRECT REDIRECT
+// 4. Google Login Button - DIRECT REDIRECT
 // ============================================
 googleBtn.addEventListener('click', function() {
     setLoading(true);
     
-    // Redirect langsung ke halaman login Google
     showMessage('Mengarahkan ke Google Login...', 'success');
     
     setTimeout(function() {
-        //Redirect ke Google login
         window.location.href = 'https://accounts.google.com/ServiceLogin?service=ah&passive=true&continue=https://www.google.com/';
     }, 1000);
 });
 
 // ============================================
-// 4. Signup Link Handler
+// 5. Signup Link Handler
 // ============================================
 if (signupLink) {
     signupLink.addEventListener('click', function(e) {
@@ -77,7 +101,7 @@ if (signupLink) {
 }
 
 // ============================================
-// 5. Helper Functions
+// 6. Helper Functions
 // ============================================
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -121,7 +145,7 @@ function createMessageContainer() {
 }
 
 // ============================================
-// 6. Check login status
+// 7. Check login status
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('LaundryApp Login Loaded');

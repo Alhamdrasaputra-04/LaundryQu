@@ -484,3 +484,20 @@ body {
         right: -50px;
     }
 }
+
+/* Demo Hint */
+.demo-hint {
+    margin-top: 25px;
+    padding: 15px;
+    background: #E0F7FA;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid #B2EBF2;
+}
+
+.demo-hint p {
+    margin: 0;
+    font-size: 14px;
+    color: #006064;
+    font-weight: 500;
+}
