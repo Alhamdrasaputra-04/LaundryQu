@@ -3,94 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LaundryKu - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <title>LaundryKu - Masuk ke Akun</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
 </head>
 <body>
-    <div class="login-wrapper">
-        <!-- Decorative Background Elements -->
-        <div class="bg-circle circle-1"></div>
-        <div class="bg-circle circle-2"></div>
-        <div class="bg-circle circle-3"></div>
-        
-        <div class="login-container">
-            <div class="login-box">
-                <!-- Header Section -->
-                <div class="login-header">
-                    <div class="logo">
-                        <div class="logo-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6C13.66,6 15,7.34 15,9C15,10.66 13.66,12 12,12C10.34,12 9,10.66 9,9C9,7.34 10.34,6 12,6M12,14C14.97,14 17.39,15.55 18.66,17.82L15.33,19.69C14.67,18.53 13.44,17.75 12,17.75C10.56,17.75 9.33,18.53 8.67,19.69L5.33,17.82C6.61,15.55 9.03,14 12,14M12,16C10.06,16 8.5,17.06 8.5,18.5H15.5C15.5,17.06 13.94,16 12,16Z" />
+
+    <div class="split-container">
+        <!-- ================= KIRI: FORM LOGIN ================= -->
+        <section class="split-form-side">
+            <div class="form-inner">
+                <!-- Brand Header -->
+                <div class="brand-header">
+                    <div class="brand-logo">
+                        <div class="logo-badge">
+                            <svg viewBox="0 0 24 24" class="logo-svg">
+                                <path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/>
                             </svg>
                         </div>
-                        <span class="logo-text">LaundryKu</span>
+                        <span class="brand-name">LaundryKu</span>
                     </div>
-                    <h2 class="welcome-text">Masuk ke Akun Anda</h2>
-                    <p class="subtitle-text">Kelola transaksi laundry dengan mudah</p>
+                    <span class="app-pill">Portal Manajemen</span>
                 </div>
-                
+
+                <!-- Welcome Text -->
+                <div class="welcome-heading">
+                    <h1 class="welcome-title">Masuk ke Akun Anda</h1>
+                    <p class="welcome-sub">Selamat datang kembali! Kelola pesanan dan status laundry dengan cepat & akurat.</p>
+                </div>
+
                 <!-- Login Form -->
-                <form class="login-form" id="loginForm">
+                <form class="login-form" id="loginForm" novalidate>
                     <div class="input-group">
-                        <label for="email">Email</label>
+                        <label for="email">Email atau Username</label>
                         <div class="input-wrapper">
-                            <svg class="input-icon" viewBox="0 0 24 24">
-                                <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,5A7,7 0 0,1 19,12A7,7 0 0,1 12,19A7,7 0 0,1 5,12A7,7 0 0,1 12,5M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z" />
-                            </svg>
-                            <input type="email" id="email" name="email" placeholder="email@domain.com" required>
+                            <span class="input-icon">
+                                <svg viewBox="0 0 24 24"><path d="M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4M20,8L12,13L4,8V6L12,11L20,6V8Z"/></svg>
+                            </span>
+                            <input type="text" id="email" name="email" placeholder="demo (atau nama@email.com)" required autocomplete="username">
                         </div>
                     </div>
-                    
+
                     <div class="input-group">
-                        <label for="password">Password</label>
+                        <div class="label-with-link">
+                            <label for="password">Password</label>
+                            <a href="#" class="forgot-password">Lupa password?</a>
+                        </div>
                         <div class="input-wrapper">
-                            <svg class="input-icon" viewBox="0 0 24 24">
-                                <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
-                            </svg>
-                            <input type="password" id="password" name="password" placeholder="••••••••" required>
-                            <button type="button" class="toggle-password" id="togglePassword">
-                                <svg class="eye-icon" viewBox="0 0 24 24">
-                                    <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
-                                </svg>
+                            <span class="input-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/></svg>
+                            </span>
+                            <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="toggle-password" id="togglePassword" aria-label="Lihat password">
+                                <svg class="eye-icon" viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="form-options">
                         <label class="checkbox-label">
                             <input type="checkbox" id="rememberMe">
-                            <span>Ingat saya</span>
+                            <span class="custom-checkbox"></span>
+                            <span>Ingat saya di perangkat ini</span>
                         </label>
-                        <a href="#" class="forgot-password">Lupa password?</a>
                     </div>
-                    
+
+                    <!-- Tombol Masuk -->
                     <button type="submit" class="login-btn" id="loginBtn">
-                        <span class="btn-text">Masuk</span>
+                        <span class="btn-text">Masuk ke Dashboard</span>
                         <div class="btn-spinner"></div>
+                        <svg class="btn-arrow" viewBox="0 0 24 24"><path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"/></svg>
                     </button>
                 </form>
-                
+
+                <!-- Demo Hint Box -->
+                <div class="demo-hint-box">
+                    <span class="hint-icon">💡</span>
+                    <span class="hint-text">Akun demo siap pakai: Username <b>demo</b> & Password <b>demo</b></span>
+                </div>
+
                 <!-- Divider -->
                 <div class="divider">
                     <span class="divider-text">atau masuk dengan</span>
                 </div>
-                
-                <!-- Google Login -->
+
+                <!-- Google Login Button dengan Logo Asli Google -->
                 <button type="button" class="google-btn" id="googleBtn">
-                    <svg class="google-icon" viewBox="0 0 24 24">
-                        <path d="M12.24,10.28V14.4H16.92C16.82,15.35 16.19,16.65 14.93,17.46L14.93,17.48L19.33,20.45L19.4,20.42C20.67,18.9 21.45,16.99 21.45,14.66C21.45,8.44 17.34,5.28 12.24,5.28C9.61,5.28 7.33,6.25 5.68,7.83L5.68,7.82L5.66,7.8L5.66,7.8L5.66,7.8C3.96,9.44 3,11.73 3,14.66C3,17.58 3.96,19.87 5.66,21.49L5.66,21.49L5.68,21.47L5.68,21.47C7.33,23.05 9.61,24 12.24,24C17.34,24 21.45,20.84 21.45,14.66C21.45,14.66 21.45,14.66 21.45,14.66C21.45,14.66 21.45,14.66 21.45,14.66C21.45,14.66 21.45,14.66 21.45,14.66C21.45,12.33 20.67,10.42 19.4,8.91L19.33,8.88L14.93,11.85L14.93,11.87C16.19,12.68 16.82,13.98 16.92,14.93L12.24,14.93L12.24,10.28Z" fill="#4285F4" />
+                    <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
                     </svg>
-                    <span class="google-text">Google</span>
+                    <span class="google-text">Masuk dengan Google</span>
                 </button>
-                
-                <!-- Sign Up Link -->
+
+                <!-- Signup Footer -->
                 <p class="signup-text">
-                    Belum punya akun? <a href="#" class="signup-link">Daftar sekarang</a>
+                    Belum punya akun pengelola? <a href="register.html" class="signup-link">Daftar sekarang</a>
                 </p>
+
+                <div class="form-footer-copy">
+                    &copy; 2026 LaundryKu System. Didesain untuk manajemen laundry modern.
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- ================= KANAN: ILUSTRASI FOTO & VALUE ================= -->
+        <section class="split-visual-side">
+            <!-- Decorative Glow Circles -->
+            <div class="glow-sphere glow-1"></div>
+            <div class="glow-sphere glow-2"></div>
+            <div class="glow-sphere glow-3"></div>
+
+            <div class="visual-content-wrap">
+                <!-- Floating Feature Badges (Di Atas Frame: Kiri & Kanan Berdampingan) -->
+                <div class="floating-badge badge-top-left">
+                    <div class="badge-icon-wrap icon-gold">
+                        <svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>
+                    </div>
+                    <div class="badge-texts">
+                        <span class="badge-title">Siap Diambil Tepat Waktu</span>
+                        <span class="badge-sub">Notifikasi & estimasi akurat</span>
+                    </div>
+                </div>
+
+                <div class="floating-badge badge-top-right">
+                    <div class="badge-icon-wrap icon-orange">
+                        <svg viewBox="0 0 24 24"><path d="M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,12.9 18.82,13.76 18.5,14.54L21.12,16.05C21.68,14.83 22,13.45 22,12C22,6.82 18.05,2.55 13,2.05M12,19A7,7 0 0,1 5,12C5,8.47 7.61,5.57 11,5.08V2.05C5.95,2.55 2,6.82 2,12A10,10 0 0,0 12,22C15.3,22 18.23,20.39 20.05,17.91L17.45,16.41C16.15,18 14.2,19 12,19M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z"/></svg>
+                    </div>
+                    <div class="badge-texts">
+                        <span class="badge-title">Tracking Real-time</span>
+                        <span class="badge-sub">Pantau proses cucian otomatis</span>
+                    </div>
+                </div>
+
+                <!-- Hero Image Card -->
+                <div class="illustration-frame">
+                    <img src="assets/login-hero.jpg" alt="Ilustrasi Layanan Laundry Modern" class="hero-image" loading="lazy">
+                    <div class="image-gradient-overlay"></div>
+                </div>
+
+                <!-- Visual Text / Tagline (Bebas Tabrakan) -->
+                <div class="visual-text-block">
+                    <h2 class="visual-heading">Solusi Cerdas Operasional Laundry Anda</h2>
+                    <p class="visual-desc">
+                        Satu platform terintegrasi untuk pencatatan transaksi, status pengerjaan, estimasi waktu selesai, dan laporan pendapatan.
+                    </p>
+                    <div class="feature-bullets">
+                        <span class="f-pill">✨ Transaksi Otomatis</span>
+                        <span class="f-pill">📊 Grafik Pendapatan</span>
+                        <span class="f-pill">📱 Supabase Cloud</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-    
-    <script src="script.js"></script>
+
+    <!-- Message Toast Container for login.js -->
+    <div class="message-container"></div>
+
+    <script src="login.js"></script>
 </body>
 </html>

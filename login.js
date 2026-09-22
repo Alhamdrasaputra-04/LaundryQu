@@ -54,7 +54,7 @@ loginForm.addEventListener('submit', function(e) {
             method: 'demo'
         }));
         setTimeout(function() { 
-            window.location.href = 'login-dashboard.html'; 
+            window.location.href = 'dashboard.html'; 
         }, 1000);
         return;
     }
@@ -72,7 +72,7 @@ loginForm.addEventListener('submit', function(e) {
         showMessage('Login berhasil! Selamat datang.', 'success');
         localStorage.setItem('laundryUser', JSON.stringify({ email: email, isLoggedIn: true }));
         setTimeout(function() { 
-            window.location.href = 'login-dashboard.html'; 
+            window.location.href = 'dashboard.html'; 
         }, 1500);
     }, 1500);
 });
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (storedUser) {
         const user = JSON.parse(storedUser);
         if (user.isLoggedIn) {
-            window.location.href = 'login-dashboard.html';
+            window.location.href = 'dashboard.html';
         }
     }
 });

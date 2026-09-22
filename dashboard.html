@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LaundryKu Dashboard - Kelola transaksi laundry dengan mudah dan efisien">
+    <title>LaundryKu - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="logo-icon-wrap">
+                    <svg viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                </div>
+                <span class="logo-name">LaundryKu</span>
+            </div>
+            <button class="sidebar-close" id="sidebarClose">
+                <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Menu Utama</div>
+            <ul class="nav-list">
+                <li class="nav-item active" id="nav-dashboard">
+                    <a href="#" class="nav-link" data-page="dashboard">
+                        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z"/></svg>
+                        <span>Dashboard</span>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-pelanggan">
+                    <a href="#" class="nav-link" data-page="pelanggan">
+                        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
+                        <span>Pelanggan</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-transaksi">
+                    <a href="#" class="nav-link" data-page="transaksi">
+                        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                        <span>Transaksi</span>
+                        <span class="nav-badge">5</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-cucian">
+                    <a href="#" class="nav-link" data-page="cucian">
+                        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12Z"/></svg>
+                        <span>Status Cucian</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-pembayaran">
+                    <a href="#" class="nav-link" data-page="pembayaran">
+                        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,11H4V8H20V11Z"/></svg>
+                        <span>Pembayaran</span>
+                    </a>
+                </li>
+                <div class="nav-section-label">Laporan & Data</div>
+                <li class="nav-item" id="nav-laporan">
+                    <a href="#" class="nav-link" data-page="laporan">
+                        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z"/></svg>
+                        <span>Laporan</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="nav-pengaturan">
+                    <a href="#" class="nav-link" data-page="pengaturan">
+                        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+                        <span>Pengaturan</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="user-avatar-sm">A</div>
+                <div class="user-info-sm">
+                    <div class="user-name-sm">Admin LaundryKu</div>
+                    <div class="user-role-sm">Administrator</div>
+                </div>
+            </div>
+            <a href="Login.html" class="logout-btn" id="logoutBtn" title="Logout">
+                <svg viewBox="0 0 24 24"><path d="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2A2,2 0 0,1 15,4V8H13V4H4V20H13V16H15V20A2,2 0 0,1 13,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2H13Z"/></svg>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="mainContent">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Sidebar">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="page-breadcrumb">
+                    <span class="breadcrumb-root">LaundryKu</span>
+                    <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                    <span class="breadcrumb-current" id="breadcrumbCurrent">Dashboard</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-date" id="topbarDate"></div>
+                <div class="notification-wrap">
+                    <button class="icon-btn" id="notifBtn" title="Notifikasi" aria-label="Notifikasi">
+                        <svg viewBox="0 0 24 24"><path d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"/></svg>
+                        <span class="notif-dot"></span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">
+                            <span>Notifikasi</span>
+                            <button class="mark-all-read" id="markAllRead">Tandai semua dibaca</button>
+                        </div>
+                        <div class="notif-list">
+                            <div class="notif-item unread">
+                                <div class="notif-icon green"><svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg></div>
+                                <div class="notif-body">
+                                    <div class="notif-title">Cucian Budi siap diambil</div>
+                                    <div class="notif-time">5 menit lalu</div>
+                                </div>
+                            </div>
+                            <div class="notif-item unread">
+                                <div class="notif-icon orange"><svg viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg></div>
+                                <div class="notif-body">
+                                    <div class="notif-title">Transaksi #TRX00128 melewati estimasi</div>
+                                    <div class="notif-time">20 menit lalu</div>
+                                </div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="notif-icon blue"><svg viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg></div>
+                                <div class="notif-body">
+                                    <div class="notif-title">3 transaksi baru hari ini</div>
+                                    <div class="notif-time">1 jam lalu</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="topbar-user">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name">Admin</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <div class="page-content" id="pageContent">
+
+            <!-- ===== DASHBOARD PAGE ===== -->
+            <div class="page" id="page-dashboard">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <div class="dashboard-title-wrap">
+                        <h1 class="dashboard-title">Selamat Datang, Admin! &#128075;</h1>
+                        <p class="dashboard-subtitle">Berikut ringkasan aktivitas laundry hari ini.</p>
+                    </div>
+                    <button class="btn-primary" id="addTransaksiBtn">
+                        <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                        Tambah Transaksi
+                    </button>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card card-blue">
+                        <div class="card-content">
+                            <div class="card-label">Transaksi Hari Ini</div>
+                            <div class="card-value" id="cardTransaksi">12</div>
+                            <div class="card-change positive">
+                                <svg viewBox="0 0 24 24"><path d="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z"/></svg>
+                                +3 dari kemarin
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="summary-card card-green">
+                        <div class="card-content">
+                            <div class="card-label">Pendapatan Hari Ini</div>
+                            <div class="card-value" id="cardPendapatan">Rp 485.000</div>
+                            <div class="card-change positive">
+                                <svg viewBox="0 0 24 24"><path d="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z"/></svg>
+                                +12% dari kemarin
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,11H4V8H20V11Z"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="summary-card card-orange">
+                        <div class="card-content">
+                            <div class="card-label">Sedang Diproses</div>
+                            <div class="card-value" id="cardDiproses">8</div>
+                            <div class="card-change neutral">
+                                <svg viewBox="0 0 24 24"><path d="M20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12M22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12Z"/></svg>
+                                Dalam pengerjaan
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12Z"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="summary-card card-purple">
+                        <div class="card-content">
+                            <div class="card-label">Siap Diambil</div>
+                            <div class="card-value" id="cardSiap">4</div>
+                            <div class="card-change positive">
+                                <svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>
+                                Menunggu pelanggan
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20.5,3L20.34,3.03L15,5.1L9,3L3.36,5C3.15,5.1 3,5.3 3,5.5V20.5A0.5,0.5 0 0,0 3.5,21L3.66,20.97L9,18.9L15,21L20.64,19C20.85,18.9 21,18.7 21,18.5V3.5A0.5,0.5 0 0,0 20.5,3M15,19L9,16.9V5L15,7.1V19Z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div class="analytics-row">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <h2 class="chart-title">Grafik Pendapatan</h2>
+                                <p class="chart-subtitle">Perkembangan pendapatan harian</p>
+                            </div>
+                            <div class="chart-filters">
+                                <button class="filter-btn active" id="filter7">7 Hari</button>
+                                <button class="filter-btn" id="filter30">30 Hari</button>
+                            </div>
+                        </div>
+                        <div class="chart-wrap">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="donut-card">
+                        <div class="chart-header">
+                            <div>
+                                <h2 class="chart-title">Status Cucian</h2>
+                                <p class="chart-subtitle">Distribusi status saat ini</p>
+                            </div>
+                        </div>
+                        <div class="donut-wrap">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                        <div class="donut-legend">
+                            <div class="legend-item"><span class="legend-dot" style="background:#EB7F31"></span>Baru Masuk <b>5</b></div>
+                            <div class="legend-item"><span class="legend-dot" style="background:#FCAD38"></span>Dicuci <b>3</b></div>
+                            <div class="legend-item"><span class="legend-dot" style="background:#F59E0B"></span>Dikeringkan <b>4</b></div>
+                            <div class="legend-item"><span class="legend-dot" style="background:#10B981"></span>Disetrika <b>2</b></div>
+                            <div class="legend-item"><span class="legend-dot" style="background:#8B5CF6"></span>Siap Diambil <b>4</b></div>
+                            <div class="legend-item"><span class="legend-dot" style="background:#64748B"></span>Selesai <b>12</b></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Section -->
+                <div class="bottom-row">
+                    <div class="attention-card">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <svg viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg>
+                                Cucian Perlu Perhatian
+                            </h2>
+                            <button class="btn-text-link">Lihat Semua</button>
+                        </div>
+                        <div class="attention-list">
+                            <div class="attention-item urgent">
+                                <div class="attention-status-bar"></div>
+                                <div class="attention-info">
+                                    <div class="attention-name">Budi Santoso</div>
+                                    <div class="attention-code">#TRX00125</div>
+                                    <div class="attention-meta">
+                                        <span class="badge badge-ready">Siap Diambil</span>
+                                        <span class="attention-time">Estimasi: Hari ini</span>
+                                    </div>
+                                </div>
+                                <button class="attention-action" aria-label="Lihat detail">
+                                    <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                                </button>
+                            </div>
+                            <div class="attention-item overdue">
+                                <div class="attention-status-bar"></div>
+                                <div class="attention-info">
+                                    <div class="attention-name">Siti Rahayu</div>
+                                    <div class="attention-code">#TRX00128</div>
+                                    <div class="attention-meta">
+                                        <span class="badge badge-overdue">Terlambat</span>
+                                        <span class="attention-time">Est: 15 Sep 2026</span>
+                                    </div>
+                                </div>
+                                <button class="attention-action" aria-label="Lihat detail">
+                                    <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                                </button>
+                            </div>
+                            <div class="attention-item warning">
+                                <div class="attention-status-bar"></div>
+                                <div class="attention-info">
+                                    <div class="attention-name">Ahmad Wahyu</div>
+                                    <div class="attention-code">#TRX00130</div>
+                                    <div class="attention-meta">
+                                        <span class="badge badge-warning">Mendekati Estimasi</span>
+                                        <span class="attention-time">Est: Besok</span>
+                                    </div>
+                                </div>
+                                <button class="attention-action" aria-label="Lihat detail">
+                                    <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                                </button>
+                            </div>
+                            <div class="attention-item urgent">
+                                <div class="attention-status-bar"></div>
+                                <div class="attention-info">
+                                    <div class="attention-name">Dewi Lestari</div>
+                                    <div class="attention-code">#TRX00122</div>
+                                    <div class="attention-meta">
+                                        <span class="badge badge-ready">Siap Diambil</span>
+                                        <span class="attention-time">Estimasi: Kemarin</span>
+                                    </div>
+                                </div>
+                                <button class="attention-action" aria-label="Lihat detail">
+                                    <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quick-stats-card">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <svg viewBox="0 0 24 24"><path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z"/></svg>
+                                Statistik Cepat
+                            </h2>
+                        </div>
+                        <div class="quick-stats-list">
+                            <div class="quick-stat-item">
+                                <div class="qs-label">Total Pelanggan</div>
+                                <div class="qs-value">148</div>
+                                <div class="qs-bar"><div class="qs-fill" style="width:74%"></div></div>
+                            </div>
+                            <div class="quick-stat-item">
+                                <div class="qs-label">Transaksi Bulan Ini</div>
+                                <div class="qs-value">89</div>
+                                <div class="qs-bar"><div class="qs-fill blue" style="width:60%"></div></div>
+                            </div>
+                            <div class="quick-stat-item">
+                                <div class="qs-label">Pendapatan Bulan Ini</div>
+                                <div class="qs-value">Rp 4,2 Juta</div>
+                                <div class="qs-bar"><div class="qs-fill green" style="width:85%"></div></div>
+                            </div>
+                            <div class="quick-stat-item">
+                                <div class="qs-label">Rata-rata/Transaksi</div>
+                                <div class="qs-value">Rp 47.000</div>
+                                <div class="qs-bar"><div class="qs-fill purple" style="width:47%"></div></div>
+                            </div>
+                        </div>
+                        <div class="tracking-preview">
+                            <div class="tracking-title">Tracking Terbaru &mdash; #TRX00131</div>
+                            <div class="tracking-timeline">
+                                <div class="tl-item done">
+                                    <div class="tl-dot"></div>
+                                    <div class="tl-content">
+                                        <div class="tl-label">Pesanan Diterima</div>
+                                        <div class="tl-time">16 Sep, 08:30</div>
+                                    </div>
+                                </div>
+                                <div class="tl-item done">
+                                    <div class="tl-dot"></div>
+                                    <div class="tl-content">
+                                        <div class="tl-label">Sedang Dicuci</div>
+                                        <div class="tl-time">16 Sep, 10:00</div>
+                                    </div>
+                                </div>
+                                <div class="tl-item active">
+                                    <div class="tl-dot"></div>
+                                    <div class="tl-content">
+                                        <div class="tl-label">Dikeringkan</div>
+                                        <div class="tl-time">Sedang diproses</div>
+                                    </div>
+                                </div>
+                                <div class="tl-item">
+                                    <div class="tl-dot"></div>
+                                    <div class="tl-content">
+                                        <div class="tl-label">Disetrika</div>
+                                        <div class="tl-time">&mdash;</div>
+                                    </div>
+                                </div>
+                                <div class="tl-item">
+                                    <div class="tl-dot"></div>
+                                    <div class="tl-content">
+                                        <div class="tl-label">Siap Diambil</div>
+                                        <div class="tl-time">&mdash;</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions Table -->
+                <div class="table-card">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <svg viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                            Transaksi Terbaru
+                        </h2>
+                        <button class="btn-text-link" id="viewAllTrx">Lihat Semua Transaksi &rarr;</button>
+                    </div>
+                    <div class="table-search-bar">
+                        <div class="search-input-wrap">
+                            <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+                            <input type="text" id="searchTrx" placeholder="Cari transaksi..." class="search-input">
+                        </div>
+                        <div class="table-filters">
+                            <select id="filterStatus" class="filter-select">
+                                <option value="">Semua Status</option>
+                                <option value="Baru Masuk">Baru Masuk</option>
+                                <option value="Dicuci">Dicuci</option>
+                                <option value="Dikeringkan">Dikeringkan</option>
+                                <option value="Disetrika">Disetrika</option>
+                                <option value="Siap Diambil">Siap Diambil</option>
+                                <option value="Selesai">Selesai</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="data-table" id="recentTable">
+                            <thead>
+                                <tr>
+                                    <th>ID Transaksi</th>
+                                    <th>Pelanggan</th>
+                                    <th>Layanan</th>
+                                    <th>Total</th>
+                                    <th>Status Cucian</th>
+                                    <th>Pembayaran</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionTbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ===== MODAL TAMBAH TRANSAKSI ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="addTransaksiModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">
+                    <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                    Tambah Transaksi
+                </h2>
+                <button class="modal-close" id="modalClose" aria-label="Tutup modal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="transaksiForm" novalidate>
+                    <div class="form-step-indicator">
+                        <div class="step-dot active" data-step="1">1</div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step="2">2</div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step="3">3</div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pelangganSelect">Pelanggan <span class="required">*</span></label>
+                            <select id="pelangganSelect" class="form-control" required>
+                                <option value="">-- Pilih Pelanggan --</option>
+                                <option>Budi Santoso</option>
+                                <option>Siti Rahayu</option>
+                                <option>Ahmad Wahyu</option>
+                                <option>Dewi Lestari</option>
+                                <option>Eko Prasetyo</option>
+                                <option>Rina Wati</option>
+                                <option>Hendra Kurniawan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="layananSelect">Layanan <span class="required">*</span></label>
+                            <select id="layananSelect" class="form-control" required>
+                                <option value="">-- Pilih Layanan --</option>
+                                <option value="5000">Cuci Reguler (Rp 5.000/kg)</option>
+                                <option value="8000">Cuci Express (Rp 8.000/kg)</option>
+                                <option value="10000">Cuci Setrika (Rp 10.000/kg)</option>
+                                <option value="15000">Dry Clean (Rp 15.000/pcs)</option>
+                                <option value="20000">Laundry Sepatu (Rp 20.000/pcs)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="beratInput">Berat / Jumlah <span class="required">*</span></label>
+                            <input type="number" id="beratInput" class="form-control" placeholder="cth: 3 (kg atau pcs)" min="1" max="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Harga</label>
+                            <div class="total-display" id="totalDisplay">Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tanggalMasuk">Tanggal Masuk</label>
+                            <input type="date" id="tanggalMasuk" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="estimasiSelesai">Estimasi Selesai</label>
+                            <input type="date" id="estimasiSelesai" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="catatanInput">Catatan (opsional)</label>
+                        <textarea id="catatanInput" class="form-control" rows="3" placeholder="Catatan tambahan, contoh: jangan dicampur, ada noda membandel..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelModal">Batal</button>
+                <button class="btn-primary" id="saveTransaksi">
+                    <svg viewBox="0 0 24 24"><path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/></svg>
+                    Simpan Transaksi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
