@@ -726,6 +726,11 @@ function initSidebar() {
 
     // Nav links
     document.querySelectorAll('.nav-link').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href !== '#' && href.includes('.html')) {
+            // Izinkan browser berpindah halaman ke file html yang dituju
+            return;
+        }
         link.addEventListener('click', e => {
             e.preventDefault();
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -734,8 +739,8 @@ function initSidebar() {
             const bc = document.getElementById('breadcrumbCurrent');
             if (bc) bc.textContent = capitalize(page);
             if (window.innerWidth < 900) closeSidebar();
-            if (page !== 'dashboard') {
-                showToast(`Halaman ${capitalize(page)} siap dikembangkan pada fase berikutnya!`, 'info');
+            if (page && page !== 'dashboard') {
+                showToast(`Halaman ${capitalize(page)} siap dikembangkan!`, 'info');
             }
         });
     });
@@ -944,11 +949,7 @@ function showToast(message, type = 'info') {
 
 // viewAllTrx link
 document.getElementById('viewAllTrx') && document.getElementById('viewAllTrx').addEventListener('click', () => {
-    showToast('Menampilkan seluruh data transaksi pada tabel', 'info');
-    document.getElementById('searchTrx').value = '';
-    document.getElementById('filterStatus').value = '';
-    filteredTransactions = [...allTransactions];
-    renderTransactions(filteredTransactions);
+    window.location.href = 'transaksi.html';
 });
 
 // ============================================================

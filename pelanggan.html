@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaundryKu - Data Pelanggan</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .wa-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .wa-btn:hover {
+            background: #1EBE5D;
+            transform: scale(1.05);
+        }
+        .wa-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+        .cust-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .cust-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .cust-name-title {
+            font-weight: 600;
+            color: var(--text-1);
+        }
+        .cust-notes-sub {
+            font-size: 11.5px;
+            color: var(--text-3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+        .order-badge-pill {
+            display: inline-block;
+            padding: 3px 9px;
+            background: #EFF6FF;
+            color: #2563EB;
+            font-weight: 600;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .detail-meta-box {
+            background: #F8FAFC;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-light);
+        }
+        .detail-meta-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13.5px;
+            border-bottom: 1px dashed var(--border-light);
+        }
+        .detail-meta-row:last-child {
+            border-bottom: none;
+        }
+        .meta-lbl { color: var(--text-3); font-weight: 500; }
+        .meta-val { color: var(--text-1); font-weight: 600; }
+        .cust-order-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .cust-order-history-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: #F1F5F9;
+            color: var(--text-2);
+            font-size: 11.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .cust-order-history-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrap">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12Z"/></svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-name">LaundryKu</span>
+                        <span class="logo-tag">Management System</span>
+                    </div>
+                </div>
+                <button class="sidebar-close" id="sidebarClose" aria-label="Tutup Menu">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Menu Utama</div>
+                <ul class="nav-list">
+                    <li class="nav-item" id="nav-dashboard">
+                        <a href="dashboard.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z"/></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active" id="nav-pelanggan">
+                        <a href="pelanggan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
+                            <span>Pelanggan</span>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-transaksi">
+                        <a href="transaksi.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                            <span>Transaksi</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar-sm">A</div>
+                    <div class="user-info-sm">
+                        <div class="user-name-sm">Admin LaundryKu</div>
+                        <div class="user-role-sm">Administrator</div>
+                    </div>
+                </div>
+                <a href="Login.html" class="logout-btn" id="logoutBtn" title="Keluar">
+                    <svg viewBox="0 0 24 24"><path d="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2A2,2 0 0,1 15,4V8H13V4H4V20H13V16H15V20A2,2 0 0,1 13,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2H13Z"/></svg>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ===== OVERLAY ===== -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Sidebar">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <div class="page-breadcrumb">
+                        <span class="breadcrumb-root">LaundryKu</span>
+                        <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                        <span class="breadcrumb-current">Master Pelanggan</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="topbarDate"></div>
+                    <div class="topbar-user">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <div class="page-content">
+                <!-- Page Header -->
+                <div class="dashboard-header">
+                    <div class="dashboard-title-wrap">
+                        <h1 class="dashboard-title">Direktori Pelanggan 👥</h1>
+                        <p class="dashboard-subtitle">Kelola kontak pelanggan, riwayat cucian, dan kirim pesan WhatsApp langsung.</p>
+                    </div>
+                    <button class="btn-primary" id="openAddCustomerModalBtn">
+                        <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                        Tambah Pelanggan
+                    </button>
+                </div>
+
+                <!-- Summary Cards Pelanggan -->
+                <div class="summary-cards" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="summary-card card-blue">
+                        <div class="card-content">
+                            <div class="card-label">Total Pelanggan Terdaftar</div>
+                            <div class="card-value" id="cardTotalPelanggan">0</div>
+                            <div class="card-change positive">
+                                <svg viewBox="0 0 24 24"><path d="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z"/></svg>
+                                Database Supabase
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="summary-card card-orange">
+                        <div class="card-content">
+                            <div class="card-label">Pelanggan Aktif Mencuci</div>
+                            <div class="card-value" id="cardPelangganAktif">0</div>
+                            <div class="card-change neutral">
+                                <svg viewBox="0 0 24 24"><path d="M20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12M22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12Z"/></svg>
+                                Sedang ada pesanan
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 1,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 1,1 8,12A4,4 0 0,1 12,8Z"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="summary-card card-green">
+                        <div class="card-content">
+                            <div class="card-label">Pelanggan Baru Bulan Ini</div>
+                            <div class="card-value" id="cardPelangganBaru">7</div>
+                            <div class="card-change positive">
+                                <svg viewBox="0 0 24 24"><path d="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z"/></svg>
+                                Bertumbuh aktif
+                            </div>
+                        </div>
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Card Pelanggan -->
+                <div class="table-card">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <svg viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
+                            Daftar Pelanggan Tetap
+                        </h2>
+                    </div>
+
+                    <div class="table-search-bar">
+                        <div class="search-input-wrap" style="flex:1;">
+                            <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+                            <input type="text" id="searchCustomer" placeholder="Cari nama pelanggan, nomor telepon, atau alamat..." class="search-input">
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="data-table" id="customerTable">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Pelanggan</th>
+                                    <th>No. Telepon / WA</th>
+                                    <th>Alamat Lengkap</th>
+                                    <th>Total Order</th>
+                                    <th>Terdaftar</th>
+                                    <th style="text-align:right;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customerTbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== MODAL TAMBAH / EDIT PELANGGAN ===== -->
+    <div class="modal-overlay" id="customerModalOverlay">
+        <div class="modal" id="customerModal" role="dialog" aria-modal="true" aria-labelledby="custModalTitle">
+            <div class="modal-header">
+                <h2 class="modal-title" id="custModalTitle">
+                    <svg viewBox="0 0 24 24"><path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/></svg>
+                    Tambah Pelanggan Baru
+                </h2>
+                <button class="modal-close" id="closeCustModal" aria-label="Tutup modal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="customerForm" onsubmit="event.preventDefault();">
+                    <input type="hidden" id="custEditId">
+                    <div class="form-group">
+                        <label for="custNama">Nama Lengkap <span class="required">*</span></label>
+                        <input type="text" id="custNama" class="form-control" placeholder="Contoh: Budi Santoso" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="custTelepon">Nomor Telepon / WhatsApp <span class="required">*</span></label>
+                        <input type="tel" id="custTelepon" class="form-control" placeholder="Contoh: 081234567890" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="custAlamat">Alamat Tempat Tinggal</label>
+                        <textarea id="custAlamat" class="form-control" rows="2" placeholder="Contoh: Jl. Kaliurang KM 5, Sleman"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="custCatatan">Catatan / Preferensi Khusus</label>
+                        <textarea id="custCatatan" class="form-control" rows="2" placeholder="Contoh: Pisahkan kemeja putih, jangan pakai pelembut berlebih..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelCustModal">Batal</button>
+                <button class="btn-primary" id="saveCustomerBtn">
+                    <svg viewBox="0 0 24 24"><path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/></svg>
+                    Simpan Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DETAIL RIWAYAT CUCIAN PELANGGAN ===== -->
+    <div class="modal-overlay" id="customerDetailModalOverlay">
+        <div class="modal modal-lg" id="customerDetailModal" role="dialog" aria-modal="true" aria-labelledby="custDetailTitle">
+            <div class="modal-header">
+                <div class="modal-title-with-badge">
+                    <h2 class="modal-title" id="custDetailTitle">Profil & Riwayat Pelanggan</h2>
+                    <span class="badge badge-ready" id="custDetailBadge">Pelanggan Tetap</span>
+                </div>
+                <button class="modal-close" id="closeCustDetailModal" aria-label="Tutup modal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-meta-box">
+                    <div class="detail-meta-row">
+                        <span class="meta-lbl">Nama Lengkap</span>
+                        <span class="meta-val" id="detCustNama">-</span>
+                    </div>
+                    <div class="detail-meta-row">
+                        <span class="meta-lbl">WhatsApp / HP</span>
+                        <span class="meta-val" id="detCustTelp">-</span>
+                    </div>
+                    <div class="detail-meta-row">
+                        <span class="meta-lbl">Alamat Domisili</span>
+                        <span class="meta-val" id="detCustAlamat">-</span>
+                    </div>
+                    <div class="detail-meta-row">
+                        <span class="meta-lbl">Catatan Khusus</span>
+                        <span class="meta-val" id="detCustCatatan">-</span>
+                    </div>
+                </div>
+
+                <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                    <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--primary);"><path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z"/></svg>
+                    Riwayat Transaksi Pelanggan
+                </h3>
+                <div class="table-wrap">
+                    <table class="cust-order-history-table">
+                        <thead>
+                            <tr>
+                                <th>Kode</th>
+                                <th>Tanggal</th>
+                                <th>Layanan</th>
+                                <th>Total</th>
+                                <th>Status Cucian</th>
+                                <th>Pembayaran</th>
+                            </tr>
+                        </thead>
+                        <tbody id="custOrderHistoryTbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="closeCustDetailBtn">Tutup</button>
+                <a href="#" class="btn-primary" id="detCustWaBtn" target="_blank" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#25D366;border-color:#25D366;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>
+                    Hubungi via WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="pelanggan.js"></script>
+</body>
+</html>

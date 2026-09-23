@@ -161,6 +161,158 @@ const LaundryDB = {
         } else if (action === 'delete') {
             list = list.filter(t => t.id !== item.id);
         }
+        localStorage.setItem('laundry_transactions', JSON.stringify(list));
+    },
+
+    // 5. Ambil Data Pelanggan
+    async getCustomers() {
+        if (sbClient) {
+            try {
+                const { data, error } = await sbClient
+                    .from('pelanggan')
+                    .select('*')
+                    .order('id', { ascending: true });
+
+                if (!error && data && data.length > 0) {
+                    return data.map(c => ({
+                        id: c.id,
+                        code: 'PLG00' + c.id,
+                        nama: c.nama,
+                        telepon: c.nomor_telepon || '-',
+                        alamat: c.alamat || '-',
+                        catatan: c.catatan || '-',
+                        tanggal: c.created_at ? c.created_at.split('T')[0] : '2026-09-01'
+                    }));
+                }
+            } catch (err) {
+                console.warn('Supabase fetch pelanggan error:', err.message);
+            }
+        }
+        // Fallback: Ambil dari localStorage
+        const local = localStorage.getItem('laundry_customers');
+        if (local) {
+            try { return JSON.parse(local); } catch(e){}
+        }
+        // Default awal jika kosong
+        const defaultCustomers = [
+            { id: 1, code: 'PLG001', nama: 'Budi Santoso',     telepon: '081234567890', alamat: 'Jl. Kaliurang KM 5, Yogyakarta',   catatan: 'Pelanggan express prioritas', tanggal: '2026-09-01' },
+            { id: 2, code: 'PLG002', nama: 'Siti Rahayu',      telepon: '081398765432', alamat: 'Jl. Gejayan No. 12, Sleman',       catatan: 'Langganan dry clean jas kantor', tanggal: '2026-09-02' },
+            { id: 3, code: 'PLG003', nama: 'Ahmad Wahyu',      telepon: '082155667788', alamat: 'Jl. Seturan Raya No. 45, Depok',   catatan: 'Jangan pakai pewangi menyengat', tanggal: '2026-09-03' },
+            { id: 4, code: 'PLG004', nama: 'Dewi Lestari',     telepon: '085711223344', alamat: 'Jl. Palagan KM 8, Ngaglik',       catatan: 'Sering cuci sepatu sneakers', tanggal: '2026-09-05' },
+            { id: 5, code: 'PLG005', nama: 'Eko Prasetyo',     telepon: '081900112233', alamat: 'Jl. Monjali No. 20, Sleman',      catatan: 'Kemeja kerja selalu dilipat rapi', tanggal: '2026-09-06' },
+            { id: 6, code: 'PLG006', nama: 'Rina Wati',        telepon: '087833445566', alamat: 'Jl. Colombo No. 8, Yogyakarta',    catatan: 'Pakaian bayi pisahkan deterjen', tanggal: '2026-09-08' },
+            { id: 7, code: 'PLG007', nama: 'Hendra Kurniawan', telepon: '081288990011', alamat: 'Jl. Solo KM 9, Kalasan',          catatan: 'Cuci bed cover dan sprei tebal', tanggal: '2026-09-10' }
+        ];
+        localStorage.setItem('laundry_customers', JSON.stringify(defaultCustomers));
+        return defaultCustomers;
+    },
+
+    // 6. Tambah Pelanggan
+    async addCustomer(cust) {
+        let insertedId = Date.now();
+        if (sbClient) {
+            try {
+                const { data, error } = await sbClient
+                    .from('pelanggan')
+                    .insert([{
+                        nama: cust.nama,
+                        nomor_telepon: cust.telepon,
+                        alamat: cust.alamat || '-',
+                        catatan: cust.catatan || '-'
+                    }])
+                    .select();
+
+                if (!error && data && data[0]) {
+                    insertedId = data[0].id;
+                }
+            } catch (err) {
+                console.warn('Supabase add customer error:', err.message);
+            }
+        }
+        const newCust = {
+            id: insertedId,
+            code: 'PLG00' + (typeof insertedId === 'number' && insertedId < 1000 ? insertedId : Math.floor(Math.random() * 800 + 100)),
+            nama: cust.nama,
+            telepon: cust.telepon,
+            alamat: cust.alamat || '-',
+            catatan: cust.catatan || '-',
+            tanggal: new Date().toISOString().split('T')[0]
+        };
+        LaundryDB.syncCustomer(newCust, 'add');
+        return newCust;
+    },
+
+    // 7. Update Pelanggan
+    async updateCustomer(id, updatedData) {
+        if (sbClient) {
+            try {
+                await sbClient
+                    .from('pelanggan')
+                    .update({
+                        nama: updatedData.nama,
+                        nomor_telepon: updatedData.telepon,
+                        alamat: updatedData.alamat,
+                        catatan: updatedData.catatan
+                    })
+                    .eq('id', id);
+            } catch (err) {
+                console.warn('Supabase update customer warning:', err.message);
+            }
+        }
+        LaundryDB.syncCustomer({ id, ...updatedData }, 'update');
+    },
+
+    // 8. Hapus Pelanggan
+    async deleteCustomer(id) {
+        if (sbClient) {
+            try {
+                await sbClient.from('pelanggan').delete().eq('id', id);
+            } catch (err) {
+                console.warn('Supabase delete customer warning:', err.message);
+            }
+        }
+        LaundryDB.syncCustomer({ id }, 'delete');
+    },
+
+    // Helper sinkronisasi Customer LocalStorage
+    syncCustomer(item, action) {
+        let list = [];
+        try {
+            const stored = localStorage.getItem('laundry_customers');
+            list = stored ? JSON.parse(stored) : [];
+        } catch(e) { list = []; }
+
+        if (action === 'add') {
+            list.unshift(item);
+        } else if (action === 'update') {
+            const idx = list.findIndex(c => String(c.id) === String(item.id));
+            if (idx !== -1) {
+                list[idx] = { ...list[idx], ...item };
+            }
+        } else if (action === 'delete') {
+            list = list.filter(c => String(c.id) !== String(item.id));
+        }
+        localStorage.setItem('laundry_customers', JSON.stringify(list));
+    },
+
+    // 9. Ambil Master Layanan (Tarif)
+    async getServices() {
+        if (sbClient) {
+            try {
+                const { data, error } = await sbClient
+                    .from('layanan')
+                    .select('*')
+                    .order('id', { ascending: true });
+                if (!error && data && data.length > 0) return data;
+            } catch(e){}
+        }
+        return [
+            { id: 1, nama_layanan: 'Cuci Reguler', harga: 5000, satuan: 'kg', durasi_jam: 48 },
+            { id: 2, nama_layanan: 'Cuci Express', harga: 8000, satuan: 'kg', durasi_jam: 24 },
+            { id: 3, nama_layanan: 'Cuci Setrika', harga: 10000, satuan: 'kg', durasi_jam: 48 },
+            { id: 4, nama_layanan: 'Dry Clean', harga: 15000, satuan: 'pcs', durasi_jam: 72 },
+            { id: 5, nama_layanan: 'Laundry Sepatu', harga: 20000, satuan: 'pcs', durasi_jam: 72 }
+        ];
     }
 };
 
