@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initUserProfile();
     initSidebar();
     initSearch();
+    initViewPresets();
     initDetailModal();
     loadCucianData();
 });
@@ -82,6 +83,15 @@ async function loadCucianData() {
 // ============================================================
 // RENDER KANBAN BOARD
 // ============================================================
+const STAGE_CLASS_MAP = {
+    'Baru Masuk':   'stage-baru',
+    'Dicuci':       'stage-cuci',
+    'Dikeringkan':  'stage-kering',
+    'Disetrika':    'stage-setrika',
+    'Siap Diambil': 'stage-siap',
+    'Selesai':      'stage-selesai'
+};
+
 function renderKanban(data) {
     const todayStr = new Date().toISOString().split('T')[0];
 
@@ -99,40 +109,75 @@ function renderKanban(data) {
         }
 
         colEl.innerHTML = stageItems.map(trx => {
-            const isOverdue = trx.statusCucian !== 'Selesai' && trx.estimasi && trx.estimasi < todayStr;
-            const overdueHtml = isOverdue ? `<span class="overdue">⚠️ Melewati Estimasi!</span>` : '';
-            
-            let btnActionHtml = '';
-            if (stage.next) {
-                btnActionHtml = `
-                    <button class="btn-advance-stage" onclick="advanceStage('${trx.id}', '${stage.next}')" title="Pindahkan ke ${stage.next}">
-                        ${stage.nextLabel}
-                    </button>
-                `;
-            } else {
-                btnActionHtml = `
-                    <button class="btn-advance-stage done" disabled>
-                        ${stage.nextLabel}
-                    </button>
+            const cardStageClass = STAGE_CLASS_MAP[stage.key] || '';
+            const isCompleted = stage.key === 'Selesai';
+            const isReady = stage.key === 'Siap Diambil';
+
+            // WhatsApp link khusus jika Siap Diambil
+            let waBtnHtml = '';
+            let rawPhone = (trx.telepon || '').replace(/[^0-9]/g, '');
+            if (rawPhone.startsWith('0')) rawPhone = '62' + rawPhone.slice(1);
+            if (isReady && rawPhone) {
+                const msg = encodeURIComponent(`Halo Kak ${trx.pelanggan}, kami dari LaundryKu mengabarkan cucian #${trx.id} (${trx.layanan}) sudah SIAP DIAMBIL di kasir. Total tagihan: Rp ${(Number(trx.total)||0).toLocaleString('id-ID')} (${trx.pembayaran}). Terima kasih!`);
+                waBtnHtml = `
+                    <a href="https://wa.me/${rawPhone}?text=${msg}" target="_blank" class="btn-card-wa" title="Kirim WA Siap Diambil">
+                        <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>
+                    </a>
                 `;
             }
 
+            // Tampilan Khusus Card Selesai
+            if (isCompleted) {
+                return `
+                    <div class="kanban-card ${cardStageClass}" id="card-${trx.id}">
+                        <div class="card-top">
+                            <span class="card-trx-id">#${trx.id}</span>
+                            <span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span>
+                        </div>
+                        <div class="card-cust-name" title="${trx.pelanggan}">${trx.pelanggan}</div>
+                        <div class="card-service-meta">
+                            <span>${trx.layanan}</span> &bull; <b>${trx.berat} kg</b>
+                        </div>
+                        <div class="card-dates">
+                            <div>📅 Masuk: ${trx.tanggal || '-'}</div>
+                            <div>✅ Diambil: ${trx.estimasi || trx.tanggal || 'Selesai'}</div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-completed-detail" onclick="viewDetailKanban('${trx.id}')" title="Lihat Rincian & Nota">
+                                <svg style="width:14px;height:14px;fill:white;" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M16,18H8V16H16V18M16,14H8V12H16V14M13,9V3.5L18.5,9H13Z"/></svg>
+                                Rincian Transaksi
+                            </button>
+                            <button class="btn-undo-stage" onclick="revertStage('${trx.id}', 'Siap Diambil')" title="Kembalikan ke Siap Diambil (Koreksi)">
+                                ↩
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Tampilan Card Aktif (Baru Masuk, Dicuci, Dikeringkan, Disetrika, Siap Diambil)
+            const isOverdue = trx.estimasi && trx.estimasi < todayStr;
+            const overdueHtml = isOverdue ? `<span class="overdue">⚠️ Lewat Estimasi!</span>` : '';
+
             return `
-                <div class="kanban-card" id="card-${trx.id}">
+                <div class="kanban-card ${cardStageClass}" id="card-${trx.id}">
                     <div class="card-top">
                         <span class="card-trx-id">#${trx.id}</span>
                         <span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span>
                     </div>
-                    <div class="card-cust-name">${trx.pelanggan}</div>
+                    <div class="card-cust-name" title="${trx.pelanggan}">${trx.pelanggan}</div>
                     <div class="card-service-meta">
                         <span>${trx.layanan}</span> &bull; <b>${trx.berat} kg</b>
                     </div>
                     <div class="card-dates">
-                        <div>Masuk: ${trx.tanggal || '-'}</div>
-                        <div>Est: ${trx.estimasi || '-'} ${overdueHtml}</div>
+                        <div>📅 Masuk: ${trx.tanggal || '-'}</div>
+                        <div>⏱️ Est: ${trx.estimasi || '-'} ${overdueHtml}</div>
                     </div>
                     <div class="card-actions">
-                        ${btnActionHtml}
+                        <button class="btn-advance-stage" onclick="advanceStage('${trx.id}', '${stage.next}')" title="Pindahkan ke ${stage.next}">
+                            ${stage.nextLabel}
+                        </button>
+                        ${waBtnHtml}
                         <button class="btn-card-detail" onclick="viewDetailKanban('${trx.id}')" title="Lihat Timeline & Detail">
                             <svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
                         </button>
@@ -144,32 +189,47 @@ function renderKanban(data) {
 }
 
 // ============================================================
-// ADVANCE STAGE ACTION (1-KLIK)
+// ADVANCE & REVERT STAGE ACTIONS
 // ============================================================
 async function advanceStage(trxId, nextStage) {
     if (!nextStage) return;
 
-    // 1. Simpan ke database Supabase & local storage
     if (window.LaundryDB) {
         await LaundryDB.updateStatus(trxId, nextStage, null, `Tahap cucian dimajukan ke ${nextStage}`);
     }
 
-    // 2. Update state in memory
     const target = allTransactions.find(t => t.id === trxId);
-    if (target) {
-        target.statusCucian = nextStage;
-    }
+    if (target) target.statusCucian = nextStage;
+    
     const filteredTarget = filteredTransactions.find(t => t.id === trxId);
-    if (filteredTarget) {
-        filteredTarget.statusCucian = nextStage;
-    }
+    if (filteredTarget) filteredTarget.statusCucian = nextStage;
 
-    // 3. Render ulang kanban & notif
     renderKanban(filteredTransactions);
     updateLiveNotifications();
-    showToast(`Pesanan #${trxId} berhasil dipindahkan ke: ${nextStage}!`, 'success');
+    showToast(`Pesanan #${trxId} berhasil dimajukan ke: ${nextStage}!`, 'success');
 }
 window.advanceStage = advanceStage;
+
+async function revertStage(trxId, prevStage) {
+    if (!prevStage) return;
+
+    if (confirm(`Kembalikan pesanan #${trxId} ke tahap "${prevStage}"?`)) {
+        if (window.LaundryDB) {
+            await LaundryDB.updateStatus(trxId, prevStage, null, `Tahap cucian dikembalikan ke ${prevStage}`);
+        }
+
+        const target = allTransactions.find(t => t.id === trxId);
+        if (target) target.statusCucian = prevStage;
+        
+        const filteredTarget = filteredTransactions.find(t => t.id === trxId);
+        if (filteredTarget) filteredTarget.statusCucian = prevStage;
+
+        renderKanban(filteredTransactions);
+        updateLiveNotifications();
+        showToast(`Pesanan #${trxId} dikembalikan ke: ${prevStage}`, 'info');
+    }
+}
+window.revertStage = revertStage;
 
 // ============================================================
 // SEARCH FILTER
@@ -190,6 +250,37 @@ function initSearch() {
             );
         }
         renderKanban(filteredTransactions);
+    });
+}
+
+// ============================================================
+// VIEW PRESETS (6 KOLOM, AKTIF, ATAU READY/SELESAI)
+// ============================================================
+function initViewPresets() {
+    const tabBtns = document.querySelectorAll('.view-tab-btn');
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const view = btn.dataset.view;
+            applyViewPreset(view);
+        });
+    });
+}
+
+function applyViewPreset(view) {
+    const cols = document.querySelectorAll('.kanban-col');
+    cols.forEach(col => {
+        const stage = col.dataset.stage;
+        if (view === 'all') {
+            col.classList.remove('col-hidden');
+        } else if (view === 'active') {
+            if (stage === 'Selesai') col.classList.add('col-hidden');
+            else col.classList.remove('col-hidden');
+        } else if (view === 'ready') {
+            if (stage === 'Siap Diambil' || stage === 'Selesai') col.classList.remove('col-hidden');
+            else col.classList.add('col-hidden');
+        }
     });
 }
 

@@ -11,23 +11,72 @@
     <!-- Main Style -->
     <link rel="stylesheet" href="dashboard.css">
     <style>
+        .kanban-view-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .view-tab-btn {
+            background: #FFFFFF;
+            border: 1px solid var(--border-light);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .view-tab-btn:hover {
+            background: #F1F5F9;
+            color: var(--primary);
+        }
+        .view-tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(235, 127, 49, 0.25);
+        }
+
         .kanban-container {
             display: flex;
             gap: 16px;
             overflow-x: auto;
             padding-bottom: 24px;
-            min-height: calc(100vh - 220px);
+            min-height: calc(100vh - 250px);
             align-items: flex-start;
         }
-        .kanban-col {
-            flex: 0 0 280px;
+        .kanban-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .kanban-container::-webkit-scrollbar-track {
             background: #F1F5F9;
+            border-radius: 4px;
+        }
+        .kanban-container::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+        .kanban-container::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        .kanban-col {
+            flex: 0 0 290px;
+            min-width: 290px;
+            background: #F8FAFC;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-light);
             display: flex;
             flex-direction: column;
-            max-height: calc(100vh - 200px);
+            max-height: calc(100vh - 220px);
+            transition: var(--transition);
         }
+        .kanban-col.col-hidden {
+            display: none !important;
+        }
+
         .kanban-header {
             padding: 14px 16px;
             font-weight: 700;
@@ -45,7 +94,7 @@
         .kanban-col[data-stage="Dikeringkan"] .kanban-header { border-bottom-color: #F59E0B; color: #B45309; }
         .kanban-col[data-stage="Disetrika"] .kanban-header { border-bottom-color: #10B981; color: #047857; }
         .kanban-col[data-stage="Siap Diambil"] .kanban-header { border-bottom-color: #8B5CF6; color: #6D28D9; }
-        .kanban-col[data-stage="Selesai"] .kanban-header { border-bottom-color: #64748B; color: #475569; }
+        .kanban-col[data-stage="Selesai"] .kanban-header { border-bottom-color: #059669; color: #059669; }
 
         .kanban-count-badge {
             background: #E2E8F0;
@@ -63,12 +112,15 @@
             gap: 12px;
             flex: 1;
         }
+        
+        /* CARD DESIGN */
         .kanban-card {
             background: white;
             border-radius: var(--radius-sm);
             padding: 14px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
             border: 1px solid var(--border-light);
+            border-left: 4px solid var(--primary);
             transition: var(--transition);
             display: flex;
             flex-direction: column;
@@ -76,9 +128,30 @@
         }
         .kanban-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.08);
             border-color: #CBD5E1;
         }
+        .kanban-card.stage-baru      { border-left-color: #EB7F31; }
+        .kanban-card.stage-cuci      { border-left-color: #FCAD38; }
+        .kanban-card.stage-kering    { border-left-color: #F59E0B; }
+        .kanban-card.stage-setrika   { border-left-color: #10B981; }
+        .kanban-card.stage-siap      { border-left-color: #8B5CF6; }
+        
+        /* CARD COMPLETED (SELESAI DIAMBIL) REFINED */
+        .kanban-card.stage-selesai {
+            border-left-color: #059669;
+            background: #F0FDF4;
+            border-top: 1px solid #BBF7D0;
+            border-right: 1px solid #BBF7D0;
+            border-bottom: 1px solid #BBF7D0;
+        }
+        .kanban-card.stage-selesai .card-dates {
+            background: white;
+            border: 1px solid #DCFCE7;
+            color: #15803D;
+            font-weight: 500;
+        }
+
         .card-top {
             display: flex;
             justify-content: space-between;
@@ -94,6 +167,9 @@
             font-weight: 600;
             font-size: 14px;
             color: var(--text-1);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .card-service-meta {
             font-size: 12px;
@@ -103,14 +179,14 @@
             gap: 6px;
         }
         .card-dates {
-            font-size: 11px;
+            font-size: 11.5px;
             background: #F8FAFC;
-            padding: 6px 8px;
+            padding: 6px 9px;
             border-radius: 6px;
             border: 1px dashed var(--border-light);
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 3px;
         }
         .card-dates .overdue {
             color: #DC2626;
@@ -120,13 +196,14 @@
             display: flex;
             gap: 6px;
             margin-top: 4px;
+            align-items: center;
         }
         .btn-advance-stage {
             flex: 1;
             background: var(--primary);
             color: white;
             border: none;
-            padding: 7px 10px;
+            padding: 8px 10px;
             border-radius: 6px;
             font-size: 11.5px;
             font-weight: 600;
@@ -141,11 +218,28 @@
             background: var(--primary-dark);
             transform: scale(1.02);
         }
-        .btn-advance-stage.done {
-            background: #E2E8F0;
-            color: #64748B;
-            cursor: default;
+        
+        .btn-completed-detail {
+            flex: 1;
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition);
         }
+        .btn-completed-detail:hover {
+            background: #047857;
+            transform: scale(1.02);
+        }
+
         .btn-card-detail {
             background: #F1F5F9;
             border: 1px solid var(--border-light);
@@ -157,6 +251,7 @@
             justify-content: center;
             cursor: pointer;
             transition: var(--transition);
+            flex-shrink: 0;
         }
         .btn-card-detail:hover {
             background: #E2E8F0;
@@ -166,6 +261,52 @@
             height: 15px;
             fill: var(--text-2);
         }
+
+        .btn-card-wa {
+            background: #25D366;
+            border: none;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .btn-card-wa:hover {
+            background: #1EBE5D;
+            transform: scale(1.08);
+        }
+        .btn-card-wa svg {
+            width: 15px;
+            height: 15px;
+            fill: white;
+        }
+
+        .btn-undo-stage {
+            background: #FFFFFF;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #64748B;
+            font-size: 13px;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .btn-undo-stage:hover {
+            background: #F1F5F9;
+            color: #1E293B;
+            border-color: #94A3B8;
+        }
+
         .empty-col-placeholder {
             text-align: center;
             padding: 30px 10px;
@@ -319,6 +460,13 @@
                             + Transaksi Baru
                         </a>
                     </div>
+                </div>
+
+                <!-- VIEW PRESETS -->
+                <div class="kanban-view-tabs">
+                    <button class="view-tab-btn active" data-view="all">Semua Tahap (6 Kolom)</button>
+                    <button class="view-tab-btn" data-view="active">Hanya Proses Aktif (5 Kolom)</button>
+                    <button class="view-tab-btn" data-view="ready">Siap Diambil & Selesai (2 Kolom)</button>
                 </div>
 
                 <!-- KANBAN BOARD -->

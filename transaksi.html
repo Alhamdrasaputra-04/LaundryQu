@@ -158,6 +158,19 @@
                 </div>
                 <div class="topbar-right">
                     <div class="topbar-date" id="topbarDate"></div>
+                    <div class="notification-wrap">
+                        <button class="icon-btn" id="notifBtn" title="Notifikasi" aria-label="Notifikasi">
+                            <svg viewBox="0 0 24 24"><path d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"/></svg>
+                            <span class="notif-dot"></span>
+                        </button>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <span>Notifikasi</span>
+                                <button class="mark-all-read" id="markAllRead">Tandai semua dibaca</button>
+                            </div>
+                            <div class="notif-list"></div>
+                        </div>
+                    </div>
                     <div class="topbar-user">
                         <div class="user-avatar">A</div>
                         <div class="user-info">
@@ -184,7 +197,7 @@
 
                 <!-- Summary Cards Transaksi -->
                 <div class="summary-cards">
-                    <div class="summary-card card-blue">
+                    <div class="summary-card card-blue" id="trxCardTotal" style="cursor: pointer;" title="Klik untuk tampilkan semua transaksi">
                         <div class="card-content">
                             <div class="card-label">Total Transaksi</div>
                             <div class="card-value" id="trxStatTotal">0</div>
@@ -195,7 +208,7 @@
                         </div>
                     </div>
 
-                    <div class="summary-card card-orange">
+                    <div class="summary-card card-orange" id="trxCardDiproses" style="cursor: pointer;" title="Klik untuk filter proses cucian">
                         <div class="card-content">
                             <div class="card-label">Sedang Diproses</div>
                             <div class="card-value" id="trxStatDiproses">0</div>
@@ -206,7 +219,7 @@
                         </div>
                     </div>
 
-                    <div class="summary-card card-purple">
+                    <div class="summary-card card-purple" id="trxCardSiap" style="cursor: pointer;" title="Klik untuk filter siap diambil">
                         <div class="card-content">
                             <div class="card-label">Siap Diambil</div>
                             <div class="card-value" id="trxStatSiap">0</div>
@@ -217,7 +230,7 @@
                         </div>
                     </div>
 
-                    <div class="summary-card card-green">
+                    <div class="summary-card card-green" id="trxCardSelesai" style="cursor: pointer;" title="Klik untuk filter transaksi selesai">
                         <div class="card-content">
                             <div class="card-label">Transaksi Selesai</div>
                             <div class="card-value" id="trxStatSelesai">0</div>

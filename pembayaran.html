@@ -124,6 +124,183 @@
             padding-top: 10px;
         }
 
+        .summary-card {
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        .summary-card.active {
+            outline: 2px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(235, 127, 49, 0.2);
+        }
+
+        .method-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .method-badge.tunai {
+            background: #ECFDF5;
+            color: #059669;
+            border: 1px solid #A7F3D0;
+        }
+        .method-badge.qris {
+            background: #EFF6FF;
+            color: #2563EB;
+            border: 1px solid #BFDBFE;
+        }
+        .method-badge.transfer {
+            background: #FAF5FF;
+            color: #7C3AED;
+            border: 1px solid #E9D5FF;
+        }
+        .method-badge.none {
+            background: #F8FAFC;
+            color: #94A3B8;
+            border: 1px solid #E2E8F0;
+        }
+
+        /* Kasir Settlement Modal */
+        .settle-recap-box {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            font-size: 12.5px;
+        }
+        .settle-recap-item .label {
+            color: var(--text-3);
+            font-size: 11.5px;
+            margin-bottom: 2px;
+        }
+        .settle-recap-item .val {
+            font-weight: 600;
+            color: var(--text-1);
+        }
+        .settle-recap-item .val.highlight {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .pay-type-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .pay-type-btn {
+            flex: 1;
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-light);
+            background: white;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-2);
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .pay-type-btn.active {
+            border-color: var(--primary);
+            background: #FFF7ED;
+            color: var(--primary);
+        }
+        .pay-method-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .pay-method-card {
+            border: 1.5px solid var(--border-light);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: white;
+        }
+        .pay-method-card:hover {
+            border-color: var(--primary-light);
+        }
+        .pay-method-card.active {
+            border-color: var(--primary);
+            background: #FFF7ED;
+            box-shadow: 0 2px 6px rgba(235, 127, 49, 0.15);
+        }
+        .pay-method-card .method-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .pay-method-card .method-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-1);
+        }
+        .denom-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+        .denom-chip {
+            background: #F1F5F9;
+            border: 1px solid var(--border-light);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .denom-chip:hover {
+            background: #E2E8F0;
+            color: var(--text-1);
+        }
+        .change-box {
+            background: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .change-box.insufficient {
+            background: #FEF2F2;
+            border-color: #FECACA;
+        }
+        .change-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #065F46;
+        }
+        .change-box.insufficient .change-label {
+            color: #991B1B;
+        }
+        .change-val {
+            font-size: 16px;
+            font-weight: 700;
+            color: #059669;
+        }
+        .change-box.insufficient .change-val {
+            color: #DC2626;
+        }
+
         @media print {
             body * { visibility: hidden; }
             #printableReceiptBox, #printableReceiptBox * { visibility: visible; }
@@ -274,9 +451,9 @@
 
                 <!-- 4 SUMMARY CARDS KEUANGAN -->
                 <div class="summary-cards">
-                    <div class="summary-card">
+                    <div class="summary-card active" id="cardFilterOmzet" title="Klik untuk tampilkan semua tagihan">
                         <div class="card-icon-wrap" style="background:#FFF7ED; color:#EA580C;">
-                            <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6V8.08C9.3,8.4 8,9.75 8,11.5C8,13.5 9.7,14.2 11,14.6V18H13V15.92C14.7,15.6 16,14.25 16,12.5C16,10.5 14.3,9.8 13,9.4V6H11M11,10V12.7C10.5,12.5 10,12.1 10,11.5C10,10.9 10.5,10.2 11,10M13,12V14.3C13.5,14.1 14,13.7 14,13.1C14,12.5 13.5,11.8 13,12Z"/></svg>
+                            <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6V8.08C9.3,8.4 8,9.75 8,11.5C8,13.5 9.7,14.2 11,14.6V18H13V15.92C14.7,15.6 16,14.25 16,12.5C16,10.5 14.3,9.8 13,9.4V6H11M11,10V12.7C10.5,12.5 10,12.1 10,11.5C10,10.9 10.5,10.2 11,10M13,12V14.3C13.5,14.1 14,13.7 14,13.1C14,12.5 13.5,11.8 13,12Z"/></svg>
                         </div>
                         <div class="card-info">
                             <div class="card-value" id="cardTotalOmzet">Rp 0</div>
@@ -284,7 +461,7 @@
                         </div>
                     </div>
 
-                    <div class="summary-card">
+                    <div class="summary-card" id="cardFilterLunas" title="Klik untuk filter lunas">
                         <div class="card-icon-wrap" style="background:#ECFDF5; color:#10B981;">
                             <svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>
                         </div>
@@ -294,7 +471,7 @@
                         </div>
                     </div>
 
-                    <div class="summary-card">
+                    <div class="summary-card" id="cardFilterPiutang" title="Klik untuk filter piutang (belum bayar)">
                         <div class="card-icon-wrap" style="background:#FEF2F2; color:#EF4444;">
                             <svg viewBox="0 0 24 24"><path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
                         </div>
@@ -304,7 +481,7 @@
                         </div>
                     </div>
 
-                    <div class="summary-card">
+                    <div class="summary-card" id="cardFilterDP" title="Klik untuk filter DP">
                         <div class="card-icon-wrap" style="background:#FEFCE8; color:#CA8A04;">
                             <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6Z"/></svg>
                         </div>
@@ -333,6 +510,12 @@
                                 <option value="DP">DP (Uang Muka)</option>
                                 <option value="Lunas">Lunas</option>
                             </select>
+                            <select id="filterPaymentMethod" class="filter-select">
+                                <option value="">Semua Metode</option>
+                                <option value="Tunai">Tunai (Cash)</option>
+                                <option value="QRIS">QRIS</option>
+                                <option value="Transfer">Transfer Bank</option>
+                            </select>
                         </div>
                     </div>
 
@@ -345,14 +528,15 @@
                                     <th>Pelanggan</th>
                                     <th>Layanan & Berat</th>
                                     <th>Total Tagihan</th>
+                                    <th>Metode Bayar</th>
                                     <th>Status Pembayaran</th>
                                     <th>Status Cucian</th>
-                                    <th>Aksi Kasir</th>
+                                    <th style="text-align:right;">Aksi Kasir</th>
                                 </tr>
                             </thead>
                             <tbody id="paymentTbody">
                                 <tr>
-                                    <td colspan="8" style="text-align:center; padding:30px; color:#94A3B8;">Memuat data pembayaran...</td>
+                                    <td colspan="9" style="text-align:center; padding:30px; color:#94A3B8;">Memuat data pembayaran...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -360,6 +544,114 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- MODAL PELUNASAN KASIR (SETTLEMENT) -->
+    <div class="modal-overlay" id="settleModalOverlay">
+        <div class="modal-box modal-md">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <svg viewBox="0 0 24 24"><path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,11H4V8H20V11Z"/></svg>
+                    Kasir Pelunasan Pembayaran
+                </h2>
+                <button class="modal-close" id="closeSettleModal" aria-label="Tutup modal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Recap Ringkasan Order -->
+                <div class="settle-recap-box">
+                    <div class="settle-recap-item">
+                        <div class="label">ID Transaksi & Pelanggan:</div>
+                        <div class="val" id="settleRecapCust">-</div>
+                    </div>
+                    <div class="settle-recap-item">
+                        <div class="label">Layanan Cucian:</div>
+                        <div class="val" id="settleRecapService">-</div>
+                    </div>
+                    <div class="settle-recap-item">
+                        <div class="label">Status Saat Ini:</div>
+                        <div class="val" id="settleRecapStatus">-</div>
+                    </div>
+                    <div class="settle-recap-item">
+                        <div class="label">Total Tagihan:</div>
+                        <div class="val highlight" id="settleRecapTotal">Rp 0</div>
+                    </div>
+                </div>
+
+                <!-- Pilihan Tipe Pelunasan -->
+                <label style="font-size:12px; font-weight:600; color:var(--text-1); margin-bottom:6px; display:block;">Pilih Jenis Pembayaran:</label>
+                <div class="pay-type-toggle">
+                    <button type="button" class="pay-type-btn active" id="btnTypeLunas" onclick="setSettleType('Lunas')">
+                        ✓ Pelunasan Penuh (Lunas)
+                    </button>
+                    <button type="button" class="pay-type-btn" id="btnTypeDP" onclick="setSettleType('DP')">
+                        ⏱️ Bayar DP (Uang Muka)
+                    </button>
+                </div>
+
+                <!-- Input Nominal DP jika pilih DP -->
+                <div id="dpInputWrap" style="display:none; margin-bottom:14px;">
+                    <label style="font-size:12px; font-weight:600; color:var(--text-1); margin-bottom:4px; display:block;">Nominal DP yang Dibayar (Rp):</label>
+                    <input type="number" id="settleDPAmount" class="filter-select" style="width:100%; height:40px;" placeholder="Contoh: 20000" min="1000">
+                    <div style="font-size:11.5px; color:var(--text-3); margin-top:4px;" id="settleRemainingNotice">Sisa tagihan akan ditagih saat cucian diambil.</div>
+                </div>
+
+                <!-- Pilihan Metode Bayar -->
+                <label style="font-size:12px; font-weight:600; color:var(--text-1); margin-bottom:6px; display:block;">Metode Pembayaran:</label>
+                <div class="pay-method-grid">
+                    <div class="pay-method-card active" id="methodCardTunai" onclick="selectPaymentMethod('Tunai')">
+                        <div class="method-icon">💵</div>
+                        <div class="method-title">Tunai (Cash)</div>
+                    </div>
+                    <div class="pay-method-card" id="methodCardQRIS" onclick="selectPaymentMethod('QRIS')">
+                        <div class="method-icon">📱</div>
+                        <div class="method-title">QRIS</div>
+                    </div>
+                    <div class="pay-method-card" id="methodCardTransfer" onclick="selectPaymentMethod('Transfer')">
+                        <div class="method-icon">🏦</div>
+                        <div class="method-title">Transfer Bank</div>
+                    </div>
+                </div>
+
+                <!-- Kalkulator Tunai (Uang Diterima & Kembalian) -->
+                <div id="cashCalcSection">
+                    <label style="font-size:12px; font-weight:600; color:var(--text-1); margin-bottom:4px; display:block;">Uang Diterima dari Pelanggan (Rp):</label>
+                    <input type="number" id="settleCashReceived" class="filter-select" style="width:100%; height:40px; font-size:14px; font-weight:600;" placeholder="0">
+                    
+                    <div class="denom-chips">
+                        <button type="button" class="denom-chip" id="chipPas" onclick="setCashPas()">Uang Pas</button>
+                        <button type="button" class="denom-chip" onclick="setCashInput(20000)">Rp 20.000</button>
+                        <button type="button" class="denom-chip" onclick="setCashInput(50000)">Rp 50.000</button>
+                        <button type="button" class="denom-chip" onclick="setCashInput(100000)">Rp 100.000</button>
+                        <button type="button" class="denom-chip" onclick="setCashInput(200000)">Rp 200.000</button>
+                    </div>
+
+                    <div class="change-box" id="changeBox">
+                        <span class="change-label" id="changeLabel">Kembalian:</span>
+                        <span class="change-val" id="changeAmount">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Catatan Kasir (Opsional) -->
+                <div style="margin-top:10px;">
+                    <label style="font-size:12px; font-weight:600; color:var(--text-1); margin-bottom:4px; display:block;">Catatan Kasir (Opsional):</label>
+                    <input type="text" id="settleNotes" class="filter-select" style="width:100%; height:38px;" placeholder="Contoh: Diterima oleh kasir Rina">
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                <button class="btn-secondary" id="cancelSettleBtn">Batal</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-secondary" id="saveSettleOnlyBtn" style="border:1px solid #10B981; color:#059669; background:#ECFDF5; font-weight:600;">
+                        Simpan Pembayaran
+                    </button>
+                    <button class="btn-primary" id="saveAndPrintBtn">
+                        <svg viewBox="0 0 24 24"><path d="M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V15H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z"/></svg>
+                        Simpan & Cetak Struk
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL CETAK KWITANSI / STRUK -->

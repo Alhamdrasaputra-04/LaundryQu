@@ -131,6 +131,7 @@ async function initTrxData() {
 
     renderTransactions(filteredTransactions);
     updateTrxMetrics();
+    updateLiveNotifications();
 }
 
 function populateAddTrxDropdowns() {
@@ -262,10 +263,12 @@ function initFilters() {
     const cucianSelect = document.getElementById('filterCucianSelect');
     const bayarSelect = document.getElementById('filterBayarSelect');
 
+    let diprosesOnly = false;
+
     function applyFilter() {
-        const q = searchInput.value.toLowerCase().trim();
-        const sc = cucianSelect.value;
-        const sp = bayarSelect.value;
+        const q = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        const sc = cucianSelect ? cucianSelect.value : '';
+        const sp = bayarSelect ? bayarSelect.value : '';
 
         filteredTransactions = allTransactions.filter(t => {
             const matchQ = !q ||
@@ -273,8 +276,14 @@ function initFilters() {
                 t.pelanggan.toLowerCase().includes(q) ||
                 t.layanan.toLowerCase().includes(q);
 
-            const matchCucian = !sc || t.statusCucian === sc;
-            const matchBayar  = !sp || t.pembayaran === sp;
+            let matchCucian = true;
+            if (diprosesOnly) {
+                matchCucian = ['Dicuci', 'Dikeringkan', 'Disetrika'].includes(t.statusCucian);
+            } else if (sc) {
+                matchCucian = t.statusCucian === sc;
+            }
+
+            const matchBayar = !sp || t.pembayaran === sp;
 
             return matchQ && matchCucian && matchBayar;
         });
@@ -282,9 +291,53 @@ function initFilters() {
         renderTransactions(filteredTransactions);
     }
 
-    searchInput && searchInput.addEventListener('input', applyFilter);
-    cucianSelect && cucianSelect.addEventListener('change', applyFilter);
-    bayarSelect && bayarSelect.addEventListener('change', applyFilter);
+    searchInput && searchInput.addEventListener('input', () => { diprosesOnly = false; applyFilter(); });
+    cucianSelect && cucianSelect.addEventListener('change', () => { diprosesOnly = false; applyFilter(); });
+    bayarSelect && bayarSelect.addEventListener('change', () => { applyFilter(); });
+
+    // Interactive Summary Cards Filter
+    const cardTotal = document.getElementById('trxCardTotal');
+    const cardDiproses = document.getElementById('trxCardDiproses');
+    const cardSiap = document.getElementById('trxCardSiap');
+    const cardSelesai = document.getElementById('trxCardSelesai');
+
+    if (cardTotal) {
+        cardTotal.addEventListener('click', () => {
+            diprosesOnly = false;
+            if (searchInput) searchInput.value = '';
+            if (cucianSelect) cucianSelect.value = '';
+            if (bayarSelect) bayarSelect.value = '';
+            applyFilter();
+            showToast('Menampilkan seluruh data transaksi', 'info');
+        });
+    }
+
+    if (cardDiproses) {
+        cardDiproses.addEventListener('click', () => {
+            diprosesOnly = true;
+            if (cucianSelect) cucianSelect.value = '';
+            applyFilter();
+            showToast('Filter: Transaksi sedang diproses (Cuci, Kering, Setrika)', 'info');
+        });
+    }
+
+    if (cardSiap) {
+        cardSiap.addEventListener('click', () => {
+            diprosesOnly = false;
+            if (cucianSelect) cucianSelect.value = 'Siap Diambil';
+            applyFilter();
+            showToast('Filter: Transaksi siap diambil di kasir', 'info');
+        });
+    }
+
+    if (cardSelesai) {
+        cardSelesai.addEventListener('click', () => {
+            diprosesOnly = false;
+            if (cucianSelect) cucianSelect.value = 'Selesai';
+            applyFilter();
+            showToast('Filter: Transaksi selesai diambil pelanggan', 'info');
+        });
+    }
 }
 
 // ============================================================
@@ -425,6 +478,7 @@ function initModals() {
         saveAddBtn.disabled = false;
         renderTransactions(filteredTransactions);
         updateTrxMetrics();
+        updateLiveNotifications();
         closeAddModal();
         showToast(`Transaksi #${newId} berhasil disimpan ke database!`, 'success');
     });
@@ -496,6 +550,7 @@ function initModals() {
         saveEditBtn.disabled = false;
         renderTransactions(filteredTransactions);
         updateTrxMetrics();
+        updateLiveNotifications();
         closeEditModal();
         showToast(`Status transaksi #${currentEditingId} berhasil diubah ke ${newStatus}!`, 'success');
     });
@@ -600,6 +655,7 @@ async function deleteTransaction(id) {
         filteredTransactions = filteredTransactions.filter(t => t.id !== id);
         renderTransactions(filteredTransactions);
         updateTrxMetrics();
+        updateLiveNotifications();
         showToast(`Transaksi #${id} berhasil dihapus dari database`, 'success');
     }
 }
@@ -636,4 +692,78 @@ function showToast(message, type = 'info') {
         toast.style.transition = 'all 0.3s ease';
         setTimeout(() => toast.remove(), 300);
     }, 3500);
+}
+
+// ============================================================
+// LIVE NOTIFICATIONS
+// ============================================================
+function updateLiveNotifications() {
+    const notifList = document.querySelector('.notif-list');
+    const notifDot = document.querySelector('.notif-dot');
+    if (!notifList) return;
+
+    const notifs = [];
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    allTransactions.forEach(trx => {
+        if (trx.statusCucian === 'Siap Diambil') {
+            notifs.push({
+                id: trx.id,
+                color: 'green',
+                icon: '<svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>',
+                title: `Cucian ${trx.pelanggan} siap diambil!`,
+                time: `#${trx.id} • ${trx.layanan}`,
+                unread: true
+            });
+        } else if (trx.statusCucian !== 'Selesai' && trx.estimasi && trx.estimasi <= todayStr) {
+            notifs.push({
+                id: trx.id,
+                color: 'orange',
+                icon: '<svg viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg>',
+                title: `Pesanan #${trx.id} mendekati/lewat estimasi`,
+                time: `${trx.pelanggan} • Est: ${trx.estimasi}`,
+                unread: true
+            });
+        }
+    });
+
+    if (notifs.length === 0) {
+        notifList.innerHTML = `<div style="padding:20px;text-align:center;color:#94A3B8;font-size:12px;">Tidak ada notifikasi baru</div>`;
+        if (notifDot) notifDot.style.display = 'none';
+        return;
+    }
+
+    if (notifDot) notifDot.style.display = 'block';
+
+    notifList.innerHTML = notifs.slice(0, 6).map(n => `
+        <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="viewDetail('${n.id}')" style="cursor:pointer;" title="Klik untuk lihat detail">
+            <div class="notif-icon ${n.color}">${n.icon}</div>
+            <div class="notif-body">
+                <div class="notif-title">${n.title}</div>
+                <div class="notif-time">${n.time}</div>
+            </div>
+        </div>
+    `).join('');
+
+    const notifBtn = document.getElementById('notifBtn');
+    const notifDropdown = document.getElementById('notifDropdown');
+    const markAllRead = document.getElementById('markAllRead');
+
+    if (notifBtn && notifDropdown && !notifBtn.hasListener) {
+        notifBtn.hasListener = true;
+        notifBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            notifDropdown.classList.toggle('show');
+        });
+        document.addEventListener('click', e => {
+            if (!notifDropdown.contains(e.target) && e.target !== notifBtn) {
+                notifDropdown.classList.remove('show');
+            }
+        });
+        markAllRead && markAllRead.addEventListener('click', () => {
+            document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
+            if (notifDot) notifDot.style.display = 'none';
+            showToast('Semua notifikasi ditandai dibaca', 'success');
+        });
+    }
 }
