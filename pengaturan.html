@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaundryKu - Pengaturan & Master Data</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .settings-nav-tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-light);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-3);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        .settings-pane {
+            display: none;
+        }
+        .settings-pane.active {
+            display: block;
+        }
+        .settings-card {
+            background: white;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .settings-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-1);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .settings-card-sub {
+            font-size: 13px;
+            color: var(--text-3);
+            margin-bottom: 20px;
+        }
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 768px) {
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .status-pill-ok {
+            background: #ECFDF5;
+            color: #10B981;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot-ok {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10B981;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrap">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-name">LaundryKu</span>
+                        <span class="logo-tag">Management System</span>
+                    </div>
+                </div>
+                <button class="sidebar-close" id="sidebarClose" aria-label="Tutup Menu">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Menu Utama</div>
+                <ul class="nav-list">
+                    <li class="nav-item" id="nav-dashboard">
+                        <a href="dashboard.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z"/></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pelanggan">
+                        <a href="pelanggan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
+                            <span>Pelanggan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-transaksi">
+                        <a href="transaksi.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                            <span>Transaksi</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-cucian">
+                        <a href="cucian.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                            <span>Status Cucian</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pembayaran">
+                        <a href="pembayaran.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,11H4V8H20V11Z"/></svg>
+                            <span>Pembayaran</span>
+                        </a>
+                    </li>
+                    <div class="nav-section-label">Laporan & Data</div>
+                    <li class="nav-item" id="nav-laporan">
+                        <a href="laporan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z"/></svg>
+                            <span>Laporan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active" id="nav-pengaturan">
+                        <a href="pengaturan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+                            <span>Pengaturan</span>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar-sm">A</div>
+                    <div class="user-info-sm">
+                        <div class="user-name-sm">Admin LaundryKu</div>
+                        <div class="user-role-sm">Administrator</div>
+                    </div>
+                </div>
+                <a href="Login.html" class="logout-btn" id="logoutBtn" title="Keluar">
+                    <svg viewBox="0 0 24 24"><path d="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2A2,2 0 0,1 15,4V8H13V4H4V20H13V16H15V20A2,2 0 0,1 13,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2H13Z"/></svg>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ===== OVERLAY ===== -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Sidebar">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <div class="page-breadcrumb">
+                        <span class="breadcrumb-root">LaundryKu</span>
+                        <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                        <span class="breadcrumb-current">Pengaturan & Konfigurasi</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="topbarDate"></div>
+                    <div class="notification-wrap">
+                        <button class="icon-btn" id="notifBtn" title="Notifikasi" aria-label="Notifikasi">
+                            <svg viewBox="0 0 24 24"><path d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"/></svg>
+                            <span class="notif-dot"></span>
+                        </button>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <span>Notifikasi</span>
+                                <button class="mark-all-read" id="markAllRead">Tandai semua dibaca</button>
+                            </div>
+                            <div class="notif-list"></div>
+                        </div>
+                    </div>
+                    <div class="topbar-user">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <div class="page-content">
+                <div class="page-header" style="margin-bottom:16px;">
+                    <h1 class="page-title">Pengaturan Sistem & Master Data</h1>
+                    <p class="page-subtitle">Kelola profil usaha, daftar tarif layanan, kredensial admin, dan status koneksi database</p>
+                </div>
+
+                <!-- SETTINGS TABS -->
+                <div class="settings-nav-tabs">
+                    <button class="tab-btn active" data-tab="tabOutlet">🏪 Profil Outlet</button>
+                    <button class="tab-btn" data-tab="tabLayanan">🧺 Master Layanan & Tarif</button>
+                    <button class="tab-btn" data-tab="tabAkun">👤 Akun & Keamanan</button>
+                    <button class="tab-btn" data-tab="tabSistem">⚡ Database & Sinkronisasi</button>
+                </div>
+
+                <!-- TAB 1: PROFIL OUTLET -->
+                <div class="settings-pane active" id="tabOutlet">
+                    <div class="settings-card">
+                        <div class="settings-card-title">Informasi Usaha Laundry</div>
+                        <div class="settings-card-sub">Data ini akan dicetak otomatis pada nota kasir dan struk pelanggan</div>
+                        <form id="formOutlet" onsubmit="event.preventDefault();">
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label>Nama Usaha Laundry</label>
+                                    <input type="text" id="outletNama" class="form-control" value="LaundryKu">
+                                </div>
+                                <div class="form-group">
+                                    <label>Slogan / Tagline</label>
+                                    <input type="text" id="outletSlogan" class="form-control" value="Bersih, Wangi & Terpercaya">
+                                </div>
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label>Nomor WhatsApp Kasir</label>
+                                    <input type="text" id="outletWA" class="form-control" value="081234567890">
+                                </div>
+                                <div class="form-group">
+                                    <label>Jam Operasional</label>
+                                    <input type="text" id="outletJam" class="form-control" value="07:00 - 21:00 WIB">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Alamat Lengkap Outlet</label>
+                                <textarea id="outletAlamat" class="form-control" rows="2">Jl. Kampus No. 12, Limau Manis, Padang</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Pesan Kaki Struk / Footer Nota</label>
+                                <input type="text" id="outletFooter" class="form-control" value="Terima kasih atas kepercayaannya! Cucian Anda aman bersama kami.">
+                            </div>
+                            <button type="button" class="btn-primary" id="btnSaveOutlet">
+                                <svg viewBox="0 0 24 24"><path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/></svg>
+                                Simpan Profil Outlet
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- TAB 2: MASTER LAYANAN -->
+                <div class="settings-pane" id="tabLayanan">
+                    <div class="settings-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+                            <div>
+                                <div class="settings-card-title">Daftar Paket & Tarif Layanan (Phase 2 Master Data)</div>
+                                <div class="settings-card-sub" style="margin-bottom:0;">Paket layanan ini akan muncul di dropdown kasir saat menambah transaksi baru</div>
+                            </div>
+                            <button class="btn-primary" id="btnOpenAddService">
+                                <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                                + Tambah Layanan
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Layanan</th>
+                                        <th>Tarif</th>
+                                        <th>Satuan</th>
+                                        <th>Estimasi Waktu</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="serviceTbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: AKUN & KEAMANAN -->
+                <div class="settings-pane" id="tabAkun">
+                    <div class="settings-card">
+                        <div class="settings-card-title">Profil Akun Pengguna</div>
+                        <div class="settings-card-sub">Data akun admin yang saat ini terautentikasi</div>
+                        <form id="formAdminProfile" onsubmit="event.preventDefault();">
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label>Nama Lengkap</label>
+                                    <input type="text" id="adminNama" class="form-control" value="Admin LaundryKu">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email Terdaftar</label>
+                                    <input type="email" id="adminEmail" class="form-control" value="admin@laundry.com" readonly style="background:#F1F5F9;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Peran / Hak Akses</label>
+                                <input type="text" id="adminRole" class="form-control" value="Administrator (Akses Penuh)" readonly style="background:#F1F5F9;">
+                            </div>
+                            <button type="button" class="btn-primary" id="btnSaveAdminName">Perbarui Nama Profil</button>
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-card-title">Ubah Password Akun</div>
+                        <div class="settings-card-sub">Pastikan menggunakan kombinasi kata sandi yang aman</div>
+                        <form id="formChangePassword" onsubmit="event.preventDefault();">
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label>Password Baru <span class="required">*</span></label>
+                                    <input type="password" id="inputNewPassword" class="form-control" placeholder="Minimal 6 karakter" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Konfirmasi Password Baru <span class="required">*</span></label>
+                                    <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Ulangi password baru" required>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-secondary" id="btnChangePassword">Simpan Password Baru</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- TAB 4: DATABASE & SINKRONISASI -->
+                <div class="settings-pane" id="tabSistem">
+                    <div class="settings-card">
+                        <div class="settings-card-title">Status Penyimpanan Data</div>
+                        <div class="settings-card-sub">Aplikasi menggunakan arsitektur dual-layer persistence (Cloud Supabase + Fallback LocalStorage)</div>
+                        
+                        <div style="background:#F8FAFC; border:1px solid var(--border-light); border-radius:8px; padding:16px; margin-bottom:20px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <span style="font-weight:600; color:var(--text-1);">Koneksi Cloud Supabase:</span>
+                                <span class="status-pill-ok" id="supabaseStatusBadge">
+                                    <span class="status-dot-ok"></span> Terhubung (Online)
+                                </span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <span style="font-weight:600; color:var(--text-1);">Cache LocalStorage:</span>
+                                <span class="status-pill-ok">
+                                    <span class="status-dot-ok"></span> Aktif & Tersinkron
+                                </span>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-3);">
+                                URL Project: <code>https://bhopkqqehvnvrzzwnxqm.supabase.co</code>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                            <button class="btn-primary" id="btnSyncDatabase">
+                                <svg viewBox="0 0 24 24"><path d="M12,18A6,6 0 0,1 6,12C6,11 6.25,10.03 6.7,9.2L5.24,7.74C4.46,8.97 4,10.43 4,12A8,8 0 0,0 12,20V23L16,19L12,15M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13 17.75,13.97 17.3,14.8L18.76,16.26C19.54,15.03 20,13.57 20,12A8,8 0 0,0 12,4Z"/></svg>
+                                Uji Sinkronisasi Cloud
+                            </button>
+                            <button class="btn-secondary" id="btnResetCache" style="color:#DC2626; border-color:#FCA5A5;">
+                                Reset Cache Lokal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL TAMBAH / EDIT LAYANAN -->
+    <div class="modal-overlay" id="serviceModalOverlay">
+        <div class="modal-box modal-md">
+            <div class="modal-header">
+                <h2 class="modal-title" id="serviceModalTitle">Tambah Layanan Baru</h2>
+                <button class="modal-close" id="closeServiceModal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="serviceForm" onsubmit="event.preventDefault();">
+                    <input type="hidden" id="serviceEditId">
+                    <div class="form-group">
+                        <label>Nama Layanan <span class="required">*</span></label>
+                        <input type="text" id="inputServiceName" class="form-control" placeholder="Contoh: Cuci Karpet Tebal" required>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Tarif (Rp) <span class="required">*</span></label>
+                            <input type="number" id="inputServicePrice" class="form-control" placeholder="Contoh: 15000" required min="1000">
+                        </div>
+                        <div class="form-group">
+                            <label>Satuan <span class="required">*</span></label>
+                            <select id="inputServiceUnit" class="form-control" required>
+                                <option value="kg">Per Kilogram (kg)</option>
+                                <option value="pcs">Per Buah / Pcs</option>
+                                <option value="pasang">Per Pasang</option>
+                                <option value="meter">Per Meter</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Estimasi Waktu Pengerjaan</label>
+                        <input type="text" id="inputServiceDuration" class="form-control" placeholder="Contoh: 2 Hari, atau 6 Jam">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelServiceModal">Batal</button>
+                <button class="btn-primary" id="saveServiceBtn">Simpan Layanan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="pengaturan.js"></script>
+</body>
+</html>

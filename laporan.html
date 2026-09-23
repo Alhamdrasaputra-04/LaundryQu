@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaundryKu - Laporan Keuangan & Operasional</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Main Style -->
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .report-filter-bar {
+            background: white;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .filter-presets {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .preset-btn {
+            background: #F1F5F9;
+            border: 1px solid var(--border-light);
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .preset-btn:hover {
+            background: #E2E8F0;
+        }
+        .preset-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .filter-dates {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-dates input[type="date"] {
+            border: 1px solid var(--border-light);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            color: var(--text-1);
+        }
+        .export-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-export-csv {
+            background: #0284C7;
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .btn-export-csv:hover {
+            background: #0369A1;
+        }
+        .btn-print-report {
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .btn-print-report:hover {
+            background: #334155;
+        }
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 900px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .chart-box {
+            background: white;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .chart-header {
+            margin-bottom: 16px;
+        }
+        .chart-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-1);
+        }
+        .chart-sub {
+            font-size: 12px;
+            color: var(--text-3);
+        }
+
+        @media print {
+            .sidebar, .topbar, .report-filter-bar, .toast-container { display: none !important; }
+            .app-layout, .main-content, .page-content { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+            .charts-row { break-inside: avoid; }
+            .table-card { box-shadow: none !important; border: 1px solid #CBD5E1 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrap">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-name">LaundryKu</span>
+                        <span class="logo-tag">Management System</span>
+                    </div>
+                </div>
+                <button class="sidebar-close" id="sidebarClose" aria-label="Tutup Menu">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Menu Utama</div>
+                <ul class="nav-list">
+                    <li class="nav-item" id="nav-dashboard">
+                        <a href="dashboard.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z"/></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pelanggan">
+                        <a href="pelanggan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
+                            <span>Pelanggan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-transaksi">
+                        <a href="transaksi.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                            <span>Transaksi</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-cucian">
+                        <a href="cucian.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                            <span>Status Cucian</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pembayaran">
+                        <a href="pembayaran.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,11H4V8H20V11Z"/></svg>
+                            <span>Pembayaran</span>
+                        </a>
+                    </li>
+                    <div class="nav-section-label">Laporan & Data</div>
+                    <li class="nav-item active" id="nav-laporan">
+                        <a href="laporan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z"/></svg>
+                            <span>Laporan</span>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pengaturan">
+                        <a href="pengaturan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+                            <span>Pengaturan</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar-sm">A</div>
+                    <div class="user-info-sm">
+                        <div class="user-name-sm">Admin LaundryKu</div>
+                        <div class="user-role-sm">Administrator</div>
+                    </div>
+                </div>
+                <a href="Login.html" class="logout-btn" id="logoutBtn" title="Keluar">
+                    <svg viewBox="0 0 24 24"><path d="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2A2,2 0 0,1 15,4V8H13V4H4V20H13V16H15V20A2,2 0 0,1 13,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2H13Z"/></svg>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ===== OVERLAY ===== -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Sidebar">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <div class="page-breadcrumb">
+                        <span class="breadcrumb-root">LaundryKu</span>
+                        <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                        <span class="breadcrumb-current">Laporan Analitik</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="topbarDate"></div>
+                    <div class="notification-wrap">
+                        <button class="icon-btn" id="notifBtn" title="Notifikasi" aria-label="Notifikasi">
+                            <svg viewBox="0 0 24 24"><path d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"/></svg>
+                            <span class="notif-dot"></span>
+                        </button>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <span>Notifikasi</span>
+                                <button class="mark-all-read" id="markAllRead">Tandai semua dibaca</button>
+                            </div>
+                            <div class="notif-list"></div>
+                        </div>
+                    </div>
+                    <div class="topbar-user">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <div class="page-content">
+                <div class="page-header" style="margin-bottom:16px;">
+                    <h1 class="page-title">Laporan Penjualan & Performa Laundry</h1>
+                    <p class="page-subtitle">Analisis tren pendapatan, distribusi layanan favorit, dan ekspor rekap data</p>
+                </div>
+
+                <!-- FILTER BAR LAPORAN -->
+                <div class="report-filter-bar">
+                    <div class="filter-presets">
+                        <button class="preset-btn active" data-range="all">Semua Data</button>
+                        <button class="preset-btn" data-range="today">Hari Ini</button>
+                        <button class="preset-btn" data-range="7days">7 Hari Terakhir</button>
+                        <button class="preset-btn" data-range="30days">30 Hari Terakhir</button>
+                    </div>
+
+                    <div class="filter-dates">
+                        <label style="font-size:12px; color:var(--text-2); font-weight:500;">Dari:</label>
+                        <input type="date" id="filterStartDate">
+                        <label style="font-size:12px; color:var(--text-2); font-weight:500;">Sampai:</label>
+                        <input type="date" id="filterEndDate">
+                        <button class="preset-btn" id="btnApplyCustomDate">Terapkan</button>
+                    </div>
+
+                    <div class="export-btns">
+                        <button class="btn-export-csv" id="btnExportCSV" title="Download Excel CSV">
+                            <svg style="width:14px;height:14px;fill:white;" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L12,15L14,19H16.5L13.25,13.5L16.5,8H14L12,12L10,8H7.5L10.75,13.5L7.5,19H10Z"/></svg>
+                            Export CSV
+                        </button>
+                        <button class="btn-print-report" onclick="window.print()" title="Cetak Rekap Laporan">
+                            <svg style="width:14px;height:14px;fill:white;" viewBox="0 0 24 24"><path d="M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V15H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z"/></svg>
+                            Cetak Laporan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 KPI SUMMARY CARDS -->
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="card-icon-wrap" style="background:#FFF7ED; color:#EA580C;">
+                            <svg viewBox="0 0 24 24"><path d="M5,6H19V18H5V6M19,4A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4H19M9.5,12A1.5,1.5 0 0,0 11,10.5A1.5,1.5 0 0,0 9.5,9A1.5,1.5 0 0,0 8,10.5A1.5,1.5 0 0,0 9.5,12M14.5,12A1.5,1.5 0 0,0 16,10.5A1.5,1.5 0 0,0 14.5,9A1.5,1.5 0 0,0 13,10.5A1.5,1.5 0 0,0 14.5,12Z"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-value" id="kpiOmzet">Rp 0</div>
+                            <div class="card-label">Total Pendapatan Terverifikasi</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="card-icon-wrap" style="background:#EFF6FF; color:#2563EB;">
+                            <svg viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-value" id="kpiTransaksi">0</div>
+                            <div class="card-label">Jumlah Transaksi Periode</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="card-icon-wrap" style="background:#ECFDF5; color:#10B981;">
+                            <svg viewBox="0 0 24 24"><path d="M12,3A4,4 0 0,1 16,7A4,4 0 0,1 12,11A4,4 0 0,1 8,7A4,4 0 0,1 12,3M16,13.54C16,14.6 15.72,17.07 13.81,19.83L13,15L13.94,13.12C13.32,13.05 12.68,13 12,13C11.32,13 10.68,13.05 10.06,13.12L11,15L10.19,19.83C8.28,17.07 8,14.6 8,13.54C5.64,14.8 4,17.08 4,20V21H20V20C20,17.08 18.36,14.8 16,13.54Z"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-value" id="kpiBerat">0 kg</div>
+                            <div class="card-label">Total Berat Pakaian</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="card-icon-wrap" style="background:#F5F3FF; color:#7C3AED;">
+                            <svg viewBox="0 0 24 24"><path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-value" id="kpiAOV">Rp 0</div>
+                            <div class="card-label">Rata-rata Nilai Order (AOV)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 CHARTS ROW -->
+                <div class="charts-row">
+                    <div class="chart-box">
+                        <div class="chart-header">
+                            <div class="chart-title">Grafik Tren Penjualan Harian</div>
+                            <div class="chart-sub">Perkembangan total omzet per tanggal transaksi</div>
+                        </div>
+                        <div style="height:260px; position:relative;">
+                            <canvas id="reportRevenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-box">
+                        <div class="chart-header">
+                            <div class="chart-title">Distribusi Paket Layanan Terlaris</div>
+                            <div class="chart-sub">Proporsi pemilihan jenis layanan laundry</div>
+                        </div>
+                        <div style="height:260px; position:relative;">
+                            <canvas id="reportServiceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE REKAP DATA -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title-wrap">
+                            <h2 class="table-title">Rincian Transaksi Sesuai Periode</h2>
+                            <span class="table-badge" id="reportTableBadge">0 Transaksi</span>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No Nota</th>
+                                    <th>Tanggal</th>
+                                    <th>Pelanggan</th>
+                                    <th>Layanan & Berat</th>
+                                    <th>Status Pengerjaan</th>
+                                    <th>Status Bayar</th>
+                                    <th>Total Nilai</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTbody">
+                                <tr>
+                                    <td colspan="7" style="text-align:center; padding:30px; color:#94A3B8;">Memuat data laporan...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="laporan.js"></script>
+</body>
+</html>

@@ -358,6 +358,20 @@ const LaundryAuth = {
             }
         }
 
+        // Jika mendaftar sebagai pelanggan/user, otomatis daftarkan juga ke direktori pelanggan tetap
+        if (role === 'user') {
+            try {
+                await LaundryDB.addCustomer({
+                    nama: name,
+                    telepon: '-',
+                    alamat: '-',
+                    catatan: `Terdaftar mandiri via web (${cleanEmail})`
+                });
+            } catch (e) {
+                console.warn('Auto sync pelanggan error:', e);
+            }
+        }
+
         // Simpan juga di localStorage sebagai backup
         const localUsers = LaundryAuth.getLocalUsers();
         if (localUsers.some(u => u.email === cleanEmail)) {

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaundryKu - Manajemen Pembayaran & Kasir</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .pay-action-btns {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-pay-settle {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 5px 9px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-pay-settle:hover {
+            background: #059669;
+            transform: scale(1.03);
+        }
+        .btn-pay-print {
+            background: #F1F5F9;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-pay-print:hover {
+            background: #E2E8F0;
+        }
+        .btn-pay-print svg {
+            width: 15px;
+            height: 15px;
+            fill: var(--text-2);
+        }
+        .btn-pay-wa {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .btn-pay-wa:hover {
+            background: #1EBE5D;
+            transform: scale(1.05);
+        }
+        .btn-pay-wa svg {
+            width: 15px;
+            height: 15px;
+            fill: white;
+        }
+
+        /* Printable Receipt Struk Box */
+        .receipt-card {
+            background: #FFFFFF;
+            border: 1px dashed #CBD5E1;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 360px;
+            margin: 0 auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12.5px;
+            color: #1E293B;
+        }
+        .receipt-header {
+            text-align: center;
+            border-bottom: 1px dashed #CBD5E1;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+        .receipt-logo {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+        .receipt-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .receipt-total-line {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            font-size: 14px;
+            border-top: 1px dashed #CBD5E1;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .receipt-footer {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 11px;
+            color: #64748B;
+            border-top: 1px dashed #CBD5E1;
+            padding-top: 10px;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printableReceiptBox, #printableReceiptBox * { visibility: visible; }
+            #printableReceiptBox {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrap">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-name">LaundryKu</span>
+                        <span class="logo-tag">Management System</span>
+                    </div>
+                </div>
+                <button class="sidebar-close" id="sidebarClose" aria-label="Tutup Menu">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Menu Utama</div>
+                <ul class="nav-list">
+                    <li class="nav-item" id="nav-dashboard">
+                        <a href="dashboard.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z"/></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pelanggan">
+                        <a href="pelanggan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
+                            <span>Pelanggan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-transaksi">
+                        <a href="transaksi.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                            <span>Transaksi</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-cucian">
+                        <a href="cucian.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                            <span>Status Cucian</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active" id="nav-pembayaran">
+                        <a href="pembayaran.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,11H4V8H20V11Z"/></svg>
+                            <span>Pembayaran</span>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    <div class="nav-section-label">Laporan & Data</div>
+                    <li class="nav-item" id="nav-laporan">
+                        <a href="laporan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z"/></svg>
+                            <span>Laporan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pengaturan">
+                        <a href="pengaturan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+                            <span>Pengaturan</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar-sm">A</div>
+                    <div class="user-info-sm">
+                        <div class="user-name-sm">Admin LaundryKu</div>
+                        <div class="user-role-sm">Administrator</div>
+                    </div>
+                </div>
+                <a href="Login.html" class="logout-btn" id="logoutBtn" title="Keluar">
+                    <svg viewBox="0 0 24 24"><path d="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2A2,2 0 0,1 15,4V8H13V4H4V20H13V16H15V20A2,2 0 0,1 13,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2H13Z"/></svg>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ===== OVERLAY ===== -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Sidebar">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <div class="page-breadcrumb">
+                        <span class="breadcrumb-root">LaundryKu</span>
+                        <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                        <span class="breadcrumb-current">Manajemen Pembayaran & Kasir</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="topbarDate"></div>
+                    <div class="notification-wrap">
+                        <button class="icon-btn" id="notifBtn" title="Notifikasi" aria-label="Notifikasi">
+                            <svg viewBox="0 0 24 24"><path d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"/></svg>
+                            <span class="notif-dot"></span>
+                        </button>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <span>Notifikasi</span>
+                                <button class="mark-all-read" id="markAllRead">Tandai semua dibaca</button>
+                            </div>
+                            <div class="notif-list"></div>
+                        </div>
+                    </div>
+                    <div class="topbar-user">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <div class="page-content">
+                <div class="page-header" style="margin-bottom:20px;">
+                    <h1 class="page-title">Manajemen Kasir & Pembayaran</h1>
+                    <p class="page-subtitle">Kelola kas masuk, selesaikan tagihan piutang pelanggan, dan cetak bukti pembayaran</p>
+                </div>
+
+                <!-- 4 SUMMARY CARDS KEUANGAN -->
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="card-icon-wrap" style="background:#FFF7ED; color:#EA580C;">
+                            <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6V8.08C9.3,8.4 8,9.75 8,11.5C8,13.5 9.7,14.2 11,14.6V18H13V15.92C14.7,15.6 16,14.25 16,12.5C16,10.5 14.3,9.8 13,9.4V6H11M11,10V12.7C10.5,12.5 10,12.1 10,11.5C10,10.9 10.5,10.2 11,10M13,12V14.3C13.5,14.1 14,13.7 14,13.1C14,12.5 13.5,11.8 13,12Z"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-value" id="cardTotalOmzet">Rp 0</div>
+                            <div class="card-label">Total Omzet Keseluruhan</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="card-icon-wrap" style="background:#ECFDF5; color:#10B981;">
+                            <svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-value" id="cardKasLunas">Rp 0</div>
+                            <div class="card-label">Kas Masuk (Lunas)</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="card-icon-wrap" style="background:#FEF2F2; color:#EF4444;">
+                            <svg viewBox="0 0 24 24"><path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-value" id="cardTotalPiutang">Rp 0</div>
+                            <div class="card-label">Piutang (Belum Bayar)</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="card-icon-wrap" style="background:#FEFCE8; color:#CA8A04;">
+                            <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6Z"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-value" id="cardTotalDP">Rp 0</div>
+                            <div class="card-label">Pembayaran DP (Uang Muka)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE CARD PEMBAYARAN -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title-wrap">
+                            <h2 class="table-title">Daftar Tagihan & Pelunasan Kasir</h2>
+                            <span class="table-badge" id="tableCountBadge">0 Transaksi</span>
+                        </div>
+                        <div class="table-controls" style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <div class="search-box">
+                                <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+                                <input type="text" id="searchPayment" placeholder="Cari pelanggan / #TRX...">
+                            </div>
+                            <select id="filterPaymentStatus" class="filter-select">
+                                <option value="">Semua Status Bayar</option>
+                                <option value="Belum">Belum Bayar (Piutang)</option>
+                                <option value="DP">DP (Uang Muka)</option>
+                                <option value="Lunas">Lunas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID Transaksi</th>
+                                    <th>Tanggal</th>
+                                    <th>Pelanggan</th>
+                                    <th>Layanan & Berat</th>
+                                    <th>Total Tagihan</th>
+                                    <th>Status Pembayaran</th>
+                                    <th>Status Cucian</th>
+                                    <th>Aksi Kasir</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentTbody">
+                                <tr>
+                                    <td colspan="8" style="text-align:center; padding:30px; color:#94A3B8;">Memuat data pembayaran...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL CETAK KWITANSI / STRUK -->
+    <div class="modal-overlay" id="receiptModalOverlay">
+        <div class="modal-box modal-md">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <svg viewBox="0 0 24 24"><path d="M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V15H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z"/></svg>
+                    Struk Kwitansi Pembayaran
+                </h2>
+                <button class="modal-close" id="closeReceiptModal" aria-label="Tutup modal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="printableReceiptBox" class="receipt-card">
+                    <!-- Dynamic receipt contents injected by payment.js -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="closeReceiptBtn">Tutup</button>
+                <button class="btn-primary" onclick="window.print()">
+                    <svg viewBox="0 0 24 24"><path d="M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V15H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z"/></svg>
+                    Cetak Struk / Nota
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="pembayaran.js"></script>
+</body>
+</html>

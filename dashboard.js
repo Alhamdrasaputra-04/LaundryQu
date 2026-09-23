@@ -18,20 +18,51 @@ const DUMMY_TRANSACTIONS = [
     { id: 'TRX00122', pelanggan: 'Dewi Lestari',       telepon: '087812345678', berat: 6, layanan: 'Cuci Express',  total: 48000,  statusCucian: 'Baru Masuk',   pembayaran: 'Belum',  tanggal: '2026-09-16', estimasi: '2026-09-17', catatan: 'Baru masuk pagi' },
 ];
 
-const REVENUE_7 = [
-    { label: '10 Sep', value: 320000 },
-    { label: '11 Sep', value: 410000 },
-    { label: '12 Sep', value: 280000 },
-    { label: '13 Sep', value: 520000 },
-    { label: '14 Sep', value: 460000 },
-    { label: '15 Sep', value: 390000 },
-    { label: '16 Sep', value: 485000 },
-];
+// Helper kalkulasi omzet harian dinamis berdasarkan transaksi riil
+function getDynamicRevenueData(days) {
+    const now = new Date();
+    const result = [];
 
-const REVENUE_30 = Array.from({ length: 30 }, (_, i) => ({
-    label: `${(i + 1)} Sep`,
-    value: Math.floor(Math.random() * 350000 + 150000),
-}));
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const dateStr = `${yyyy}-${mm}-${dd}`;
+        const label = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+
+        const dailySum = allTransactions
+            .filter(t => t.tanggal === dateStr && t.pembayaran === 'Lunas')
+            .reduce((sum, t) => sum + (Number(t.total) || 0), 0);
+
+        result.push({ label, value: dailySum, dateStr });
+    }
+
+    // Jika belum ada omzet di rentang tanggal hari ini (misal data demo tanggal 13-16 Sep),
+    // kelompokkan transaksi riil yang ada agar grafik tetap bermakna & spesifik
+    const hasAnyValue = result.some(r => r.value > 0);
+    if (!hasAnyValue && allTransactions.length > 0) {
+        const dateMap = {};
+        allTransactions.forEach(t => {
+            if (t.tanggal && t.pembayaran === 'Lunas') {
+                dateMap[t.tanggal] = (dateMap[t.tanggal] || 0) + (Number(t.total) || 0);
+            }
+        });
+        const sortedDates = Object.keys(dateMap).sort();
+        if (sortedDates.length > 0) {
+            const slice = sortedDates.slice(-days);
+            return slice.map(ds => {
+                const parts = ds.split('-');
+                const dObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                const lbl = !isNaN(dObj) ? dObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : ds;
+                return { label: lbl, value: dateMap[ds] };
+            });
+        }
+    }
+
+    return result;
+}
 
 const STATUS_DATA = {
     labels: ['Baru Masuk', 'Dicuci', 'Dikeringkan', 'Disetrika', 'Siap Diambil', 'Selesai'],
@@ -65,7 +96,7 @@ let currentEditingId = null;
 document.addEventListener('DOMContentLoaded', () => {
     initDate();
     initUserProfile();
-    renderRevenueChart(REVENUE_7);
+    renderRevenueChart(getDynamicRevenueData(currentPeriod));
     renderStatusChart();
     initSidebar();
     initModal();
@@ -177,6 +208,12 @@ function updateDashboardMetrics() {
 
     // 6. Cucian Perlu Perhatian
     renderAttentionList();
+
+    // 7. Grafik Pendapatan Dinamis Riil
+    renderRevenueChart(getDynamicRevenueData(currentPeriod));
+
+    // 8. Live Update Notifikasi
+    updateLiveNotifications();
 }
 
 // ============================================================
@@ -372,15 +409,15 @@ function initChartFilter() {
     btn7.addEventListener('click', () => {
         btn7.classList.add('active');
         btn30.classList.remove('active');
-        renderRevenueChart(REVENUE_7);
         currentPeriod = 7;
+        renderRevenueChart(getDynamicRevenueData(7));
     });
 
     btn30.addEventListener('click', () => {
         btn30.classList.add('active');
         btn7.classList.remove('active');
-        renderRevenueChart(REVENUE_30);
         currentPeriod = 30;
+        renderRevenueChart(getDynamicRevenueData(30));
     });
 }
 
@@ -752,8 +789,80 @@ function capitalize(str) {
 }
 
 // ============================================================
-// NOTIFICATIONS
+// LIVE NOTIFICATIONS ENGINE
 // ============================================================
+function updateLiveNotifications() {
+    const notifList = document.querySelector('.notif-list');
+    const notifDot  = document.querySelector('.notif-dot');
+    if (!notifList) return;
+
+    const notifs = [];
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    allTransactions.forEach(trx => {
+        // 1. Siap Diambil
+        if (trx.statusCucian === 'Siap Diambil') {
+            notifs.push({
+                id: trx.id,
+                color: 'green',
+                icon: '<svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>',
+                title: `Cucian ${trx.pelanggan} siap diambil!`,
+                time: `#${trx.id} • ${trx.layanan}`,
+                unread: true
+            });
+        }
+        // 2. Overdue / Mendekati Estimasi (Belum selesai)
+        else if (trx.statusCucian !== 'Selesai' && trx.estimasi) {
+            if (trx.estimasi <= todayStr) {
+                notifs.push({
+                    id: trx.id,
+                    color: 'orange',
+                    icon: '<svg viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg>',
+                    title: `Pesanan #${trx.id} mendekati/lewat estimasi`,
+                    time: `${trx.pelanggan} • Est: ${trx.estimasi}`,
+                    unread: true
+                });
+            }
+        }
+        // 3. Pesanan Baru Masuk
+        else if (trx.statusCucian === 'Baru Masuk') {
+            notifs.push({
+                id: trx.id,
+                color: 'blue',
+                icon: '<svg viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>',
+                title: `Pesanan #${trx.id} baru masuk`,
+                time: `${trx.pelanggan} • ${trx.berat} kg`,
+                unread: false
+            });
+        }
+    });
+
+    if (notifs.length === 0) {
+        notifList.innerHTML = `
+            <div style="padding:24px 16px;text-align:center;color:#94A3B8;font-size:12.5px;">
+                Belum ada notifikasi penting saat ini.
+            </div>
+        `;
+        if (notifDot) notifDot.style.display = 'none';
+        return;
+    }
+
+    const unreadCount = notifs.filter(n => n.unread).length;
+    if (notifDot) {
+        notifDot.style.display = unreadCount > 0 ? 'block' : 'none';
+    }
+
+    notifList.innerHTML = notifs.slice(0, 8).map(n => `
+        <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="viewDetail('${n.id}')" style="cursor:pointer;" title="Klik untuk lihat detail transaksi #${n.id}">
+            <div class="notif-icon ${n.color}">${n.icon}</div>
+            <div class="notif-body">
+                <div class="notif-title">${n.title}</div>
+                <div class="notif-time">${n.time}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
 function initNotifications() {
     const notifBtn      = document.getElementById('notifBtn');
     const notifDropdown = document.getElementById('notifDropdown');
@@ -778,6 +887,8 @@ function initNotifications() {
         if (dot) dot.style.display = 'none';
         showToast('Semua notifikasi ditandai dibaca', 'success');
     });
+
+    updateLiveNotifications();
 }
 
 // ============================================================

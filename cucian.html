@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaundryKu - Status & Alur Pengerjaan Cucian</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .kanban-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 24px;
+            min-height: calc(100vh - 220px);
+            align-items: flex-start;
+        }
+        .kanban-col {
+            flex: 0 0 280px;
+            background: #F1F5F9;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 200px);
+        }
+        .kanban-header {
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid transparent;
+            border-top-left-radius: var(--radius-md);
+            border-top-right-radius: var(--radius-md);
+            background: white;
+        }
+        .kanban-col[data-stage="Baru Masuk"] .kanban-header { border-bottom-color: #EB7F31; color: #EB7F31; }
+        .kanban-col[data-stage="Dicuci"] .kanban-header { border-bottom-color: #FCAD38; color: #D97706; }
+        .kanban-col[data-stage="Dikeringkan"] .kanban-header { border-bottom-color: #F59E0B; color: #B45309; }
+        .kanban-col[data-stage="Disetrika"] .kanban-header { border-bottom-color: #10B981; color: #047857; }
+        .kanban-col[data-stage="Siap Diambil"] .kanban-header { border-bottom-color: #8B5CF6; color: #6D28D9; }
+        .kanban-col[data-stage="Selesai"] .kanban-header { border-bottom-color: #64748B; color: #475569; }
+
+        .kanban-count-badge {
+            background: #E2E8F0;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .kanban-body {
+            padding: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+        .kanban-card {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #CBD5E1;
+        }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-trx-id {
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--text-2);
+        }
+        .card-cust-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-1);
+        }
+        .card-service-meta {
+            font-size: 12px;
+            color: var(--text-3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-dates {
+            font-size: 11px;
+            background: #F8FAFC;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px dashed var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .card-dates .overdue {
+            color: #DC2626;
+            font-weight: 700;
+        }
+        .card-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .btn-advance-stage {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .btn-advance-stage:hover {
+            background: var(--primary-dark);
+            transform: scale(1.02);
+        }
+        .btn-advance-stage.done {
+            background: #E2E8F0;
+            color: #64748B;
+            cursor: default;
+        }
+        .btn-card-detail {
+            background: #F1F5F9;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-card-detail:hover {
+            background: #E2E8F0;
+        }
+        .btn-card-detail svg {
+            width: 15px;
+            height: 15px;
+            fill: var(--text-2);
+        }
+        .empty-col-placeholder {
+            text-align: center;
+            padding: 30px 10px;
+            color: #94A3B8;
+            font-size: 12px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrap">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-name">LaundryKu</span>
+                        <span class="logo-tag">Management System</span>
+                    </div>
+                </div>
+                <button class="sidebar-close" id="sidebarClose" aria-label="Tutup Menu">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Menu Utama</div>
+                <ul class="nav-list">
+                    <li class="nav-item" id="nav-dashboard">
+                        <a href="dashboard.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z"/></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pelanggan">
+                        <a href="pelanggan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
+                            <span>Pelanggan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-transaksi">
+                        <a href="transaksi.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3,3H21V5H3V3M3,7H15V9H3V7M3,11H21V13H3V11M3,15H15V17H3V15M3,19H21V21H3V19Z"/></svg>
+                            <span>Transaksi</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active" id="nav-cucian">
+                        <a href="cucian.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
+                            <span>Status Cucian</span>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pembayaran">
+                        <a href="pembayaran.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,11H4V8H20V11Z"/></svg>
+                            <span>Pembayaran</span>
+                        </a>
+                    </li>
+                    <div class="nav-section-label">Laporan & Data</div>
+                    <li class="nav-item" id="nav-laporan">
+                        <a href="laporan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z"/></svg>
+                            <span>Laporan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="nav-pengaturan">
+                        <a href="pengaturan.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+                            <span>Pengaturan</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar-sm">A</div>
+                    <div class="user-info-sm">
+                        <div class="user-name-sm">Admin LaundryKu</div>
+                        <div class="user-role-sm">Administrator</div>
+                    </div>
+                </div>
+                <a href="Login.html" class="logout-btn" id="logoutBtn" title="Keluar">
+                    <svg viewBox="0 0 24 24"><path d="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2A2,2 0 0,1 15,4V8H13V4H4V20H13V16H15V20A2,2 0 0,1 13,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2H13Z"/></svg>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ===== OVERLAY ===== -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Sidebar">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <div class="page-breadcrumb">
+                        <span class="breadcrumb-root">LaundryKu</span>
+                        <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                        <span class="breadcrumb-current">Status & Alur Cucian</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="topbarDate"></div>
+                    <div class="notification-wrap">
+                        <button class="icon-btn" id="notifBtn" title="Notifikasi" aria-label="Notifikasi">
+                            <svg viewBox="0 0 24 24"><path d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"/></svg>
+                            <span class="notif-dot"></span>
+                        </button>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <span>Notifikasi</span>
+                                <button class="mark-all-read" id="markAllRead">Tandai semua dibaca</button>
+                            </div>
+                            <div class="notif-list"></div>
+                        </div>
+                    </div>
+                    <div class="topbar-user">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <div class="page-content">
+                <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+                    <div>
+                        <h1 class="page-title">Alur Pengerjaan Cucian (Kanban)</h1>
+                        <p class="page-subtitle">Pantau workstation cucian dan majukan tahapan pengerjaan dengan 1-klik</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="search-box" style="margin-bottom:0;">
+                            <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+                            <input type="text" id="searchKanban" placeholder="Cari pelanggan / #TRX...">
+                        </div>
+                        <a href="transaksi.html" class="btn-primary" style="text-decoration:none;">
+                            <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                            + Transaksi Baru
+                        </a>
+                    </div>
+                </div>
+
+                <!-- KANBAN BOARD -->
+                <div class="kanban-container" id="kanbanBoard">
+                    <!-- Column 1: Baru Masuk -->
+                    <div class="kanban-col" data-stage="Baru Masuk">
+                        <div class="kanban-header">
+                            <span>📥 Baru Masuk</span>
+                            <span class="kanban-count-badge" id="count-Baru-Masuk">0</span>
+                        </div>
+                        <div class="kanban-body" id="col-Baru-Masuk"></div>
+                    </div>
+
+                    <!-- Column 2: Dicuci -->
+                    <div class="kanban-col" data-stage="Dicuci">
+                        <div class="kanban-header">
+                            <span>🧼 Sedang Dicuci</span>
+                            <span class="kanban-count-badge" id="count-Dicuci">0</span>
+                        </div>
+                        <div class="kanban-body" id="col-Dicuci"></div>
+                    </div>
+
+                    <!-- Column 3: Dikeringkan -->
+                    <div class="kanban-col" data-stage="Dikeringkan">
+                        <div class="kanban-header">
+                            <span>💨 Dikeringkan</span>
+                            <span class="kanban-count-badge" id="count-Dikeringkan">0</span>
+                        </div>
+                        <div class="kanban-body" id="col-Dikeringkan"></div>
+                    </div>
+
+                    <!-- Column 4: Disetrika -->
+                    <div class="kanban-col" data-stage="Disetrika">
+                        <div class="kanban-header">
+                            <span>👔 Disetrika</span>
+                            <span class="kanban-count-badge" id="count-Disetrika">0</span>
+                        </div>
+                        <div class="kanban-body" id="col-Disetrika"></div>
+                    </div>
+
+                    <!-- Column 5: Siap Diambil -->
+                    <div class="kanban-col" data-stage="Siap Diambil">
+                        <div class="kanban-header">
+                            <span>📦 Siap Diambil</span>
+                            <span class="kanban-count-badge" id="count-Siap-Diambil">0</span>
+                        </div>
+                        <div class="kanban-body" id="col-Siap-Diambil"></div>
+                    </div>
+
+                    <!-- Column 6: Selesai -->
+                    <div class="kanban-col" data-stage="Selesai">
+                        <div class="kanban-header">
+                            <span>✅ Selesai Diambil</span>
+                            <span class="kanban-count-badge" id="count-Selesai">0</span>
+                        </div>
+                        <div class="kanban-body" id="col-Selesai"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DETAIL & TRACKING -->
+    <div class="modal-overlay" id="detailModalOverlay">
+        <div class="modal-box modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <svg viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    Detail Transaksi <span id="detailTrxCode">#TRX...</span>
+                </h2>
+                <button class="modal-close" id="closeDetailModal" aria-label="Tutup modal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="detailModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="closeDetailBtn">Tutup</button>
+                <button class="btn-primary" id="openEditFromDetailBtn">Ubah Status Manual</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="cucian.js"></script>
+</body>
+</html>

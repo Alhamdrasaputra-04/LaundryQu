@@ -342,6 +342,36 @@ function initModals() {
     openAddBtn && openAddBtn.addEventListener('click', openAddModal);
     closeAddBtn && closeAddBtn.addEventListener('click', closeAddModal);
     cancelAddBtn && cancelAddBtn.addEventListener('click', closeAddModal);
+
+    // Tombol Cepat Tambah Pelanggan Baru Langsung Dari Modal Transaksi
+    const quickAddBtn = document.getElementById('quickAddCustBtn');
+    quickAddBtn && quickAddBtn.addEventListener('click', async () => {
+        const nama = prompt('Masukkan Nama Lengkap Pelanggan Baru:');
+        if (!nama || !nama.trim()) return;
+        const telp = prompt('Masukkan Nomor Telepon/WhatsApp (contoh: 081234567890):', '08') || '-';
+
+        const newCust = {
+            nama: nama.trim(),
+            telepon: telp.trim(),
+            alamat: '-',
+            catatan: 'Didaftarkan saat transaksi baru'
+        };
+
+        let saved = newCust;
+        if (window.LaundryDB) {
+            saved = await LaundryDB.addCustomer(newCust);
+            allCustomers.unshift(saved);
+        } else {
+            allCustomers.unshift(newCust);
+        }
+
+        populateAddTrxDropdowns();
+        const custSelect = document.getElementById('trxPelangganSelect');
+        if (custSelect) custSelect.value = newCust.nama;
+
+        showToast(`Pelanggan "${newCust.nama}" berhasil disimpan ke direktori pelanggan!`, 'success');
+    });
+
     addOverlay && addOverlay.addEventListener('click', e => {
         if (e.target === addOverlay) closeAddModal();
     });
