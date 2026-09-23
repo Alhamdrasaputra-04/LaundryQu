@@ -646,7 +646,7 @@ a:hover {
 /* Badge sebelah KANAN ATAS: Tracking Real-time */
 .badge-top-right,
 .badge-top {
-    top: -70px;
+    top: -75px;
     right: -20px;
     animation: floatRight 5s ease-in-out infinite;
 }

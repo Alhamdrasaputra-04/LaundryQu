@@ -280,9 +280,9 @@
                                 <svg viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg>
                                 Cucian Perlu Perhatian
                             </h2>
-                            <button class="btn-text-link">Lihat Semua</button>
+                            <button class="btn-text-link" id="viewAllAttention">Lihat Semua</button>
                         </div>
-                        <div class="attention-list">
+                        <div class="attention-list" id="attentionList">
                             <div class="attention-item urgent">
                                 <div class="attention-status-bar"></div>
                                 <div class="attention-info">
@@ -546,9 +546,128 @@
         </div>
     </div>
 
+    <!-- ===== MODAL DETAIL TRANSAKSI & TIMELINE ===== -->
+    <div class="modal-overlay" id="detailModalOverlay">
+        <div class="modal modal-lg" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+            <div class="modal-header">
+                <div class="modal-title-with-badge">
+                    <h2 class="modal-title" id="detailModalTitle">Detail Transaksi <span id="detailTrxCode">#TRX00125</span></h2>
+                    <span class="badge badge-ready" id="detailStatusBadge">Siap Diambil</span>
+                </div>
+                <button class="modal-close" id="closeDetailModal" aria-label="Tutup modal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Info Pelanggan & Order Grid -->
+                <div class="detail-grid">
+                    <div class="detail-card">
+                        <div class="detail-label">Pelanggan</div>
+                        <div class="detail-val-main" id="detailNama">Budi Santoso</div>
+                        <div class="detail-val-sub" id="detailTelp">📞 081234567890</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Layanan & Berat</div>
+                        <div class="detail-val-main" id="detailLayanan">Cuci Express</div>
+                        <div class="detail-val-sub" id="detailBerat">8 kg</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Total Biaya</div>
+                        <div class="detail-val-main color-primary" id="detailTotal">Rp 64.000</div>
+                        <div class="detail-val-sub"><span class="badge badge-lunas" id="detailBayarBadge">Lunas</span></div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Estimasi Selesai</div>
+                        <div class="detail-val-main" id="detailEstimasi">15 Sep 2026</div>
+                        <div class="detail-val-sub" id="detailMasuk">Masuk: 13 Sep 2026</div>
+                    </div>
+                </div>
+
+                <!-- Live Tracking Timeline (Section 14 MD) -->
+                <div class="timeline-section">
+                    <h3 class="timeline-title">
+                        <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 1,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 1,1 8,12A4,4 0 0,1 12,8Z"/></svg>
+                        Perjalanan Cucian (Live Tracking)
+                    </h3>
+                    <div class="modal-tracking-timeline" id="modalTimeline">
+                        <!-- Populated dynamically via dashboard.js -->
+                    </div>
+                </div>
+
+                <!-- Catatan Transaksi -->
+                <div class="detail-notes-card">
+                    <div class="notes-label">Catatan Transaksi:</div>
+                    <div class="notes-content" id="detailCatatan">-</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="printStrukBtn">
+                    <svg viewBox="0 0 24 24"><path d="M18,3H6V7H18M19,12A1,1 0 0,1 18,11A1,1 0 0,1 19,10A1,1 0 0,1 20,11A1,1 0 0,1 19,12M16,19H8V14H16M19,8H5A3,3 0 0,0 2,11V17H6V21H18V17H22V11A3,3 0 0,0 19,8Z"/></svg>
+                    Cetak Nota
+                </button>
+                <button class="btn-primary" id="openEditFromDetailBtn">
+                    <svg viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
+                    Ubah Status
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL UBAH STATUS TRANSAKSI ===== -->
+    <div class="modal-overlay" id="editStatusModalOverlay">
+        <div class="modal" id="editStatusModal" role="dialog" aria-modal="true" aria-labelledby="editStatusTitle">
+            <div class="modal-header">
+                <h2 class="modal-title" id="editStatusTitle">
+                    <svg viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
+                    Ubah Status Transaksi <span id="editTrxCode">#TRX...</span>
+                </h2>
+                <button class="modal-close" id="closeEditModal" aria-label="Tutup modal">
+                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editStatusForm" onsubmit="event.preventDefault();">
+                    <div class="form-group">
+                        <label for="editStatusCucian">Status Pengerjaan Cucian <span class="required">*</span></label>
+                        <select id="editStatusCucian" class="form-control" required>
+                            <option value="Baru Masuk">Baru Masuk (Diterima)</option>
+                            <option value="Dicuci">Sedang Dicuci</option>
+                            <option value="Dikeringkan">Sedang Dikeringkan</option>
+                            <option value="Disetrika">Sedang Disetrika</option>
+                            <option value="Siap Diambil">Siap Diambil</option>
+                            <option value="Selesai">Selesai (Sudah Diambil)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStatusPembayaran">Status Pembayaran <span class="required">*</span></label>
+                        <select id="editStatusPembayaran" class="form-control" required>
+                            <option value="Belum">Belum Bayar</option>
+                            <option value="DP">DP (Uang Muka)</option>
+                            <option value="Lunas">Lunas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCatatanStatus">Catatan Perubahan (opsional)</label>
+                        <textarea id="editCatatanStatus" class="form-control" rows="2" placeholder="Catatan tambahan, contoh: pakaian selesai disetrika, siap di kasir..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelEditStatusBtn">Batal</button>
+                <button class="btn-primary" id="saveEditStatusBtn">
+                    <svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>
+                    Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notifications -->
     <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
     <script src="dashboard.js"></script>
 </body>
 </html>

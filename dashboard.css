@@ -1122,3 +1122,182 @@ textarea.form-control { resize: vertical; }
 @media (max-width: 400px) {
     .summary-cards { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   DETAIL TRANSAKSI & TIMELINE MODAL STYLES
+   ============================================================ */
+.modal-lg { max-width: 680px; }
+.modal-title-with-badge { display: flex; align-items: center; gap: 12px; }
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.detail-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+}
+.detail-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-3);
+    margin-bottom: 4px;
+}
+.detail-val-main {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-1);
+    line-height: 1.3;
+}
+.detail-val-main.color-primary { color: var(--primary); }
+.detail-val-sub {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-top: 4px;
+}
+
+/* Timeline in Modal */
+.timeline-section {
+    background: #FFFFFF;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    margin-bottom: 18px;
+}
+.timeline-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.timeline-title svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--primary);
+}
+
+.modal-tracking-timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    padding: 10px 0;
+}
+.modal-tracking-timeline::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 20px;
+    right: 20px;
+    height: 3px;
+    background: var(--border);
+    z-index: 1;
+}
+
+.m-timeline-step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+}
+.m-timeline-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid var(--border);
+    color: var(--text-3);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    margin-bottom: 8px;
+}
+.m-timeline-step.done .m-timeline-dot {
+    background: var(--secondary);
+    border-color: var(--secondary);
+    color: #FFFFFF;
+    box-shadow: 0 4px 10px rgba(252, 173, 56, 0.4);
+}
+.m-timeline-step.active .m-timeline-dot {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(235, 127, 49, 0.25);
+    animation: pulse-active 1.5s infinite;
+}
+@keyframes pulse-active {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(235, 127, 49, 0.25); }
+    50% { box-shadow: 0 0 0 8px rgba(235, 127, 49, 0.1); }
+}
+
+.m-timeline-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    max-width: 80px;
+    line-height: 1.2;
+}
+.m-timeline-step.done .m-timeline-label { color: var(--text-1); font-weight: 600; }
+.m-timeline-step.active .m-timeline-label { color: var(--primary); font-weight: 700; }
+
+.detail-notes-card {
+    background: #FFFDF8;
+    border: 1px dashed rgba(235, 127, 49, 0.4);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 12.5px;
+}
+.notes-label { font-weight: 600; color: var(--primary-dark); margin-bottom: 2px; }
+.notes-content { color: var(--text-2); font-style: italic; }
+
+@media (max-width: 600px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .modal-tracking-timeline {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 10px;
+    }
+    .modal-tracking-timeline::before {
+        top: 10px;
+        bottom: 10px;
+        left: 25px;
+        width: 3px;
+        height: auto;
+    }
+    .m-timeline-step {
+        flex-direction: row;
+        gap: 14px;
+        margin-bottom: 16px;
+        text-align: left;
+    }
+}
+
+/* Print Receipt */
+@media print {
+    body * { visibility: hidden; }
+    #detailModal, #detailModal * { visibility: visible; }
+    #detailModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 100%;
+        box-shadow: none;
+        border: none;
+    }
+    .modal-close, .modal-footer { display: none; }
+}

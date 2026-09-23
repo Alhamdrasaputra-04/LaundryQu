@@ -3,19 +3,19 @@
    ============================================================ */
 
 // ============================================================
-// DUMMY DATA
+// DEFAULT DUMMY DATA (Initial Seed & Offline Fallback)
 // ============================================================
 const DUMMY_TRANSACTIONS = [
-    { id: 'TRX00131', pelanggan: 'Eko Prasetyo',      layanan: 'Cuci Setrika',  total: 75000, statusCucian: 'Dikeringkan',  pembayaran: 'Lunas',  tanggal: '2026-09-16' },
-    { id: 'TRX00130', pelanggan: 'Ahmad Wahyu',        layanan: 'Cuci Express',  total: 56000, statusCucian: 'Dicuci',        pembayaran: 'DP',     tanggal: '2026-09-16' },
-    { id: 'TRX00129', pelanggan: 'Rina Wati',          layanan: 'Cuci Reguler',  total: 35000, statusCucian: 'Baru Masuk',   pembayaran: 'Belum',  tanggal: '2026-09-16' },
-    { id: 'TRX00128', pelanggan: 'Siti Rahayu',        layanan: 'Dry Clean',     total: 90000, statusCucian: 'Disetrika',    pembayaran: 'Lunas',  tanggal: '2026-09-15' },
-    { id: 'TRX00127', pelanggan: 'Hendra Kurniawan',   layanan: 'Cuci Setrika',  total: 120000, statusCucian: 'Siap Diambil', pembayaran: 'Lunas', tanggal: '2026-09-15' },
-    { id: 'TRX00126', pelanggan: 'Dewi Lestari',       layanan: 'Laundry Sepatu',total: 40000, statusCucian: 'Siap Diambil', pembayaran: 'DP',    tanggal: '2026-09-14' },
-    { id: 'TRX00125', pelanggan: 'Budi Santoso',       layanan: 'Cuci Express',  total: 64000, statusCucian: 'Siap Diambil', pembayaran: 'Lunas', tanggal: '2026-09-14' },
-    { id: 'TRX00124', pelanggan: 'Eko Prasetyo',       layanan: 'Cuci Reguler',  total: 25000, statusCucian: 'Selesai',      pembayaran: 'Lunas', tanggal: '2026-09-13' },
-    { id: 'TRX00123', pelanggan: 'Siti Rahayu',        layanan: 'Cuci Setrika',  total: 50000, statusCucian: 'Selesai',      pembayaran: 'Lunas', tanggal: '2026-09-13' },
-    { id: 'TRX00122', pelanggan: 'Dewi Lestari',       layanan: 'Cuci Express',  total: 48000, statusCucian: 'Baru Masuk',   pembayaran: 'Belum', tanggal: '2026-09-16' },
+    { id: 'TRX00131', pelanggan: 'Eko Prasetyo',      telepon: '081234567891', berat: 4, layanan: 'Cuci Setrika',  total: 75000,  statusCucian: 'Dikeringkan',  pembayaran: 'Lunas',  tanggal: '2026-09-16', estimasi: '2026-09-17', catatan: 'Pakaian kantor, lipat rapi' },
+    { id: 'TRX00130', pelanggan: 'Ahmad Wahyu',        telepon: '085712345678', berat: 7, layanan: 'Cuci Express',  total: 56000,  statusCucian: 'Dicuci',        pembayaran: 'DP',     tanggal: '2026-09-16', estimasi: '2026-09-17', catatan: 'Express selesai besok pagi' },
+    { id: 'TRX00129', pelanggan: 'Rina Wati',          telepon: '082198765432', berat: 5, layanan: 'Cuci Reguler',  total: 35000,  statusCucian: 'Baru Masuk',   pembayaran: 'Belum',  tanggal: '2026-09-16', estimasi: '2026-09-18', catatan: 'Ada kemeja putih terpisah' },
+    { id: 'TRX00128', pelanggan: 'Siti Rahayu',        telepon: '081345678901', berat: 6, layanan: 'Dry Clean',     total: 90000,  statusCucian: 'Disetrika',    pembayaran: 'Lunas',  tanggal: '2026-09-15', estimasi: '2026-09-16', catatan: 'Gaun pesta sutra, harap hati-hati' },
+    { id: 'TRX00127', pelanggan: 'Hendra Kurniawan',   telepon: '081987654321', berat: 12,layanan: 'Cuci Setrika', total: 120000, statusCucian: 'Siap Diambil', pembayaran: 'Lunas',  tanggal: '2026-09-15', estimasi: '2026-09-16', catatan: 'Sprei king size dan selimut tebal' },
+    { id: 'TRX00126', pelanggan: 'Dewi Lestari',       telepon: '087812345678', berat: 2, layanan: 'Laundry Sepatu',total: 40000,  statusCucian: 'Siap Diambil', pembayaran: 'DP',     tanggal: '2026-09-14', estimasi: '2026-09-15', catatan: 'Sneakers putih converse' },
+    { id: 'TRX00125', pelanggan: 'Budi Santoso',       telepon: '081234567890', berat: 8, layanan: 'Cuci Express',  total: 64000,  statusCucian: 'Siap Diambil', pembayaran: 'Lunas',  tanggal: '2026-09-14', estimasi: '2026-09-15', catatan: 'Harap kabari via WhatsApp jika siap' },
+    { id: 'TRX00124', pelanggan: 'Eko Prasetyo',       telepon: '081234567891', berat: 5, layanan: 'Cuci Reguler',  total: 25000,  statusCucian: 'Selesai',      pembayaran: 'Lunas',  tanggal: '2026-09-13', estimasi: '2026-09-15', catatan: 'Pesanan diambil sendiri' },
+    { id: 'TRX00123', pelanggan: 'Siti Rahayu',        telepon: '081345678901', berat: 5, layanan: 'Cuci Setrika',  total: 50000,  statusCucian: 'Selesai',      pembayaran: 'Lunas',  tanggal: '2026-09-13', estimasi: '2026-09-15', catatan: 'Lunas tunai di kasir' },
+    { id: 'TRX00122', pelanggan: 'Dewi Lestari',       telepon: '087812345678', berat: 6, layanan: 'Cuci Express',  total: 48000,  statusCucian: 'Baru Masuk',   pembayaran: 'Belum',  tanggal: '2026-09-16', estimasi: '2026-09-17', catatan: 'Baru masuk pagi' },
 ];
 
 const REVENUE_7 = [
@@ -35,9 +35,18 @@ const REVENUE_30 = Array.from({ length: 30 }, (_, i) => ({
 
 const STATUS_DATA = {
     labels: ['Baru Masuk', 'Dicuci', 'Dikeringkan', 'Disetrika', 'Siap Diambil', 'Selesai'],
-    values: [5, 3, 4, 2, 4, 12],
+    values: [2, 1, 1, 1, 3, 2],
     colors: ['#EB7F31', '#FCAD38', '#F59E0B', '#10B981', '#8B5CF6', '#64748B'],
 };
+
+const TIMELINE_STAGES = [
+    { key: 'Baru Masuk',   label: 'Baru Masuk' },
+    { key: 'Dicuci',       label: 'Dicuci' },
+    { key: 'Dikeringkan',  label: 'Dikeringkan' },
+    { key: 'Disetrika',    label: 'Disetrika' },
+    { key: 'Siap Diambil', label: 'Siap Diambil' },
+    { key: 'Selesai',      label: 'Selesai' }
+];
 
 // ============================================================
 // STATE
@@ -47,6 +56,8 @@ let statusChart  = null;
 let currentPeriod = 7;
 let allTransactions = [...DUMMY_TRANSACTIONS];
 let filteredTransactions = [...DUMMY_TRANSACTIONS];
+let currentDetailId = null;
+let currentEditingId = null;
 
 // ============================================================
 // DOM READY
@@ -55,16 +66,164 @@ document.addEventListener('DOMContentLoaded', () => {
     initDate();
     renderRevenueChart(REVENUE_7);
     renderStatusChart();
-    renderTransactions(filteredTransactions);
     initSidebar();
     initModal();
+    initStatusAndDetailModals();
     initNotifications();
     initSearch();
     initChartFilter();
     setTodayDates();
     initTotalCalculation();
     animateSummaryCards();
+    initDashboardData();
 });
+
+// ============================================================
+// DATA INITIALIZATION & SYNC
+// ============================================================
+async function initDashboardData() {
+    try {
+        if (window.LaundryDB) {
+            let data = await LaundryDB.getTransactions();
+            if (!data || data.length === 0) {
+                // Inisialisasi awal ke localStorage jika kosong
+                localStorage.setItem('laundry_transactions', JSON.stringify(DUMMY_TRANSACTIONS));
+                data = DUMMY_TRANSACTIONS;
+            }
+            allTransactions = data;
+            filteredTransactions = [...allTransactions];
+        }
+    } catch (err) {
+        console.warn('Load transaksi warning:', err);
+    }
+    renderTransactions(filteredTransactions);
+    updateDashboardMetrics();
+}
+
+// ============================================================
+// DYNAMIC METRICS RECALCULATION
+// ============================================================
+function updateDashboardMetrics() {
+    // 1. Total Transaksi
+    const cardTrx = document.getElementById('cardTransaksi');
+    if (cardTrx) {
+        cardTrx.textContent = allTransactions.length;
+    }
+
+    // 2. Pendapatan (Total yang sudah lunas)
+    const cardPendapatan = document.getElementById('cardPendapatan');
+    if (cardPendapatan) {
+        const totalLunas = allTransactions
+            .filter(t => t.pembayaran === 'Lunas')
+            .reduce((sum, t) => sum + (Number(t.total) || 0), 0);
+        cardPendapatan.textContent = 'Rp ' + totalLunas.toLocaleString('id-ID');
+    }
+
+    // 3. Sedang Diproses (Dicuci, Dikeringkan, Disetrika)
+    const cardDiproses = document.getElementById('cardDiproses');
+    if (cardDiproses) {
+        const diprosesCount = allTransactions.filter(t => 
+            ['Dicuci', 'Dikeringkan', 'Disetrika'].includes(t.statusCucian)
+        ).length;
+        cardDiproses.textContent = diprosesCount;
+    }
+
+    // 4. Siap Diambil
+    const cardSiap = document.getElementById('cardSiap');
+    if (cardSiap) {
+        const siapCount = allTransactions.filter(t => t.statusCucian === 'Siap Diambil').length;
+        cardSiap.textContent = siapCount;
+    }
+
+    // 5. Donut Chart & Legend
+    const counts = STATUS_DATA.labels.map(lbl => 
+        allTransactions.filter(t => t.statusCucian === lbl).length
+    );
+    STATUS_DATA.values = counts;
+
+    if (statusChart) {
+        statusChart.data.datasets[0].data = counts;
+        statusChart.update();
+    }
+
+    const legendContainer = document.querySelector('.donut-legend');
+    if (legendContainer) {
+        legendContainer.innerHTML = STATUS_DATA.labels.map((lbl, idx) => `
+            <div class="legend-item">
+                <span class="legend-dot" style="background:${STATUS_DATA.colors[idx]}"></span>
+                ${lbl} <b>${STATUS_DATA.values[idx]}</b>
+            </div>
+        `).join('');
+    }
+
+    // 6. Cucian Perlu Perhatian
+    renderAttentionList();
+}
+
+// ============================================================
+// ATTENTION LIST (CUCIAN PERLU PERHATIAN)
+// ============================================================
+function renderAttentionList() {
+    const listEl = document.getElementById('attentionList');
+    if (!listEl) return;
+
+    // Prioritaskan status: Siap Diambil > Baru Masuk > Disetrika / lainnya yang belum selesai
+    const activeItems = allTransactions.filter(t => t.statusCucian !== 'Selesai');
+    
+    // Sort urutan urgensi
+    activeItems.sort((a, b) => {
+        const priority = { 'Siap Diambil': 1, 'Baru Masuk': 2, 'Disetrika': 3, 'Dikeringkan': 4, 'Dicuci': 5 };
+        return (priority[a.statusCucian] || 9) - (priority[b.statusCucian] || 9);
+    });
+
+    const displayItems = activeItems.slice(0, 4);
+
+    if (displayItems.length === 0) {
+        listEl.innerHTML = `
+            <div style="text-align:center;padding:30px 20px;color:#94A3B8;font-size:13px;">
+                🎉 Semua cucian telah selesai diambil pelanggan!
+            </div>
+        `;
+        return;
+    }
+
+    listEl.innerHTML = displayItems.map(trx => {
+        let levelClass = 'warning';
+        let badgeClass = 'badge-process';
+        let noteText = `Estimasi: ${trx.estimasi || 'Hari ini'}`;
+
+        if (trx.statusCucian === 'Siap Diambil') {
+            levelClass = 'urgent';
+            badgeClass = 'badge-ready';
+            noteText = 'Siap Diambil Pelanggan';
+        } else if (trx.statusCucian === 'Baru Masuk') {
+            levelClass = 'urgent';
+            badgeClass = 'badge-new';
+            noteText = 'Perlu segera dicuci';
+        } else if (trx.statusCucian === 'Disetrika') {
+            levelClass = 'warning';
+            badgeClass = 'badge-process';
+            noteText = 'Tahap akhir penyelesaian';
+        }
+
+        return `
+            <div class="attention-item ${levelClass}">
+                <div class="attention-status-bar"></div>
+                <div class="attention-info">
+                    <div class="attention-name">${trx.pelanggan}</div>
+                    <div class="attention-code">#${trx.id} &bull; ${trx.layanan}</div>
+                    <div class="attention-meta">
+                        <span class="badge ${badgeClass}">${trx.statusCucian}</span>
+                        <span class="attention-time">${noteText}</span>
+                    </div>
+                </div>
+                <button class="attention-action" aria-label="Lihat detail #${trx.id}" onclick="viewDetail('${trx.id}')">
+                    <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+}
 
 // ============================================================
 // DATE
@@ -239,18 +398,18 @@ function renderTransactions(data) {
             <td><span class="trx-id">#${trx.id}</span></td>
             <td><span class="pelanggan-cell">${trx.pelanggan}</span></td>
             <td>${trx.layanan}</td>
-            <td><span class="total-cell">Rp ${trx.total.toLocaleString('id-ID')}</span></td>
+            <td><span class="total-cell">Rp ${(Number(trx.total) || 0).toLocaleString('id-ID')}</span></td>
             <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${trx.statusCucian}</span></td>
             <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span></td>
             <td>
                 <div class="action-btns">
-                    <button class="action-btn view" title="Lihat Detail" onclick="viewDetail('${trx.id}')">
+                    <button class="action-btn view" title="Lihat Detail & Tracking" onclick="viewDetail('${trx.id}')">
                         <svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
                     </button>
-                    <button class="action-btn edit" title="Edit Status" onclick="editStatus('${trx.id}')">
+                    <button class="action-btn edit" title="Ubah Status Cucian & Bayar" onclick="editStatus('${trx.id}')">
                         <svg viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
                     </button>
-                    <button class="action-btn delete" title="Hapus" onclick="deleteTransaction('${trx.id}')">
+                    <button class="action-btn delete" title="Hapus Transaksi" onclick="deleteTransaction('${trx.id}')">
                         <svg viewBox="0 0 24 24"><path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z"/></svg>
                     </button>
                 </div>
@@ -259,22 +418,242 @@ function renderTransactions(data) {
     `).join('');
 }
 
+// ============================================================
+// DETAIL MODAL & LIVE TRACKING TIMELINE
+// ============================================================
 function viewDetail(id) {
-    showToast(`Membuka detail transaksi #${id}`, 'info');
+    const trx = allTransactions.find(t => t.id === id);
+    if (!trx) {
+        showToast(`Transaksi #${id} tidak ditemukan`, 'error');
+        return;
+    }
+    currentDetailId = trx.id;
+
+    // Isi konten detail
+    const trxCodeEl = document.getElementById('detailTrxCode');
+    const badgeEl   = document.getElementById('detailStatusBadge');
+    const namaEl    = document.getElementById('detailNama');
+    const telpEl    = document.getElementById('detailTelp');
+    const layEl     = document.getElementById('detailLayanan');
+    const beratEl   = document.getElementById('detailBerat');
+    const totalEl   = document.getElementById('detailTotal');
+    const bayarEl   = document.getElementById('detailBayarBadge');
+    const estEl     = document.getElementById('detailEstimasi');
+    const masukEl   = document.getElementById('detailMasuk');
+    const catEl     = document.getElementById('detailCatatan');
+
+    if (trxCodeEl) trxCodeEl.textContent = `#${trx.id}`;
+    if (badgeEl) {
+        badgeEl.textContent = trx.statusCucian;
+        badgeEl.className = `badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}`;
+    }
+    if (namaEl)  namaEl.textContent = trx.pelanggan;
+    if (telpEl)  telpEl.textContent = `📞 ${trx.telepon || '0812-3456-7890'}`;
+    if (layEl)   layEl.textContent = trx.layanan;
+    if (beratEl) beratEl.textContent = `${trx.berat || 1} kg`;
+    if (totalEl) totalEl.textContent = `Rp ${(Number(trx.total) || 0).toLocaleString('id-ID')}`;
+    if (bayarEl) {
+        bayarEl.textContent = trx.pembayaran;
+        bayarEl.className = `badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}`;
+    }
+    if (estEl)   estEl.textContent = trx.estimasi || '-';
+    if (masukEl) masukEl.textContent = `Masuk: ${trx.tanggal || '-'}`;
+    if (catEl)   catEl.textContent = trx.catatan || 'Tidak ada catatan khusus';
+
+    // Render 6-stage Timeline Tracking
+    renderModalTimeline(trx.statusCucian);
+
+    // Buka Modal Detail
+    const overlay = document.getElementById('detailModalOverlay');
+    if (overlay) {
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
+window.viewDetail = viewDetail;
+
+function closeDetailModal() {
+    const overlay = document.getElementById('detailModalOverlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
 }
 
+function renderModalTimeline(currentStatus) {
+    const container = document.getElementById('modalTimeline');
+    if (!container) return;
+
+    const currentIdx = TIMELINE_STAGES.findIndex(s => s.key === currentStatus);
+    const activeIndex = currentIdx === -1 ? 0 : currentIdx;
+
+    container.innerHTML = TIMELINE_STAGES.map((stage, idx) => {
+        let stepClass = 'm-timeline-step';
+        let dotContent = `${idx + 1}`;
+
+        if (idx < activeIndex || (activeIndex === 5 && idx === 5)) {
+            stepClass += ' done';
+            dotContent = `<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:white;"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>`;
+        } else if (idx === activeIndex) {
+            stepClass += ' active';
+        }
+
+        return `
+            <div class="${stepClass}">
+                <div class="m-timeline-dot">${dotContent}</div>
+                <div class="m-timeline-label">${stage.label}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ============================================================
+// EDIT STATUS MODAL
+// ============================================================
 function editStatus(id) {
-    showToast(`Edit status transaksi #${id}`, 'warning');
+    const trx = allTransactions.find(t => t.id === id);
+    if (!trx) {
+        showToast(`Transaksi #${id} tidak ditemukan`, 'error');
+        return;
+    }
+    currentEditingId = trx.id;
+
+    const editTrxCode = document.getElementById('editTrxCode');
+    const selectStatus = document.getElementById('editStatusCucian');
+    const selectBayar  = document.getElementById('editStatusPembayaran');
+    const inputCatatan = document.getElementById('editCatatanStatus');
+
+    if (editTrxCode) editTrxCode.textContent = `#${trx.id} (${trx.pelanggan})`;
+    if (selectStatus) selectStatus.value = trx.statusCucian;
+    if (selectBayar)  selectBayar.value  = trx.pembayaran;
+    if (inputCatatan) inputCatatan.value = '';
+
+    const overlay = document.getElementById('editStatusModalOverlay');
+    if (overlay) {
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
+window.editStatus = editStatus;
+
+function closeEditStatusModal() {
+    const overlay = document.getElementById('editStatusModalOverlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
 }
 
-function deleteTransaction(id) {
+// ============================================================
+// INIT MODAL HANDLERS (DETAIL & EDIT STATUS)
+// ============================================================
+function initStatusAndDetailModals() {
+    // Detail Modal Buttons
+    const closeDetailBtn = document.getElementById('closeDetailModal');
+    const detailOverlay  = document.getElementById('detailModalOverlay');
+    const printBtn       = document.getElementById('printStrukBtn');
+    const openEditFromDetail = document.getElementById('openEditFromDetailBtn');
+
+    closeDetailBtn && closeDetailBtn.addEventListener('click', closeDetailModal);
+    detailOverlay && detailOverlay.addEventListener('click', e => {
+        if (e.target === detailOverlay) closeDetailModal();
+    });
+    printBtn && printBtn.addEventListener('click', () => {
+        window.print();
+    });
+    openEditFromDetail && openEditFromDetail.addEventListener('click', () => {
+        if (currentDetailId) {
+            closeDetailModal();
+            editStatus(currentDetailId);
+        }
+    });
+
+    // Edit Status Modal Buttons
+    const closeEditBtn   = document.getElementById('closeEditModal');
+    const cancelEditBtn  = document.getElementById('cancelEditStatusBtn');
+    const editOverlay    = document.getElementById('editStatusModalOverlay');
+    const saveEditBtn    = document.getElementById('saveEditStatusBtn');
+
+    closeEditBtn && closeEditBtn.addEventListener('click', closeEditStatusModal);
+    cancelEditBtn && cancelEditBtn.addEventListener('click', closeEditStatusModal);
+    editOverlay && editOverlay.addEventListener('click', e => {
+        if (e.target === editOverlay) closeEditStatusModal();
+    });
+
+    saveEditBtn && saveEditBtn.addEventListener('click', async () => {
+        if (!currentEditingId) return;
+
+        const newStatus = document.getElementById('editStatusCucian').value;
+        const newPayment = document.getElementById('editStatusPembayaran').value;
+        const catatan = document.getElementById('editCatatanStatus').value.trim();
+
+        // 1. Simpan ke Database Supabase & LocalStorage
+        if (window.LaundryDB) {
+            await LaundryDB.updateStatus(currentEditingId, newStatus, newPayment, catatan);
+        }
+
+        // 2. Update state lokal
+        const trx = allTransactions.find(t => t.id === currentEditingId);
+        if (trx) {
+            trx.statusCucian = newStatus;
+            trx.pembayaran = newPayment;
+            if (catatan) trx.catatan = catatan;
+        }
+        const filteredTrx = filteredTransactions.find(t => t.id === currentEditingId);
+        if (filteredTrx) {
+            filteredTrx.statusCucian = newStatus;
+            filteredTrx.pembayaran = newPayment;
+            if (catatan) filteredTrx.catatan = catatan;
+        }
+
+        // 3. Render ulang tampilan & update metrik
+        renderTransactions(filteredTransactions);
+        updateDashboardMetrics();
+        closeEditStatusModal();
+        showToast(`Status transaksi #${currentEditingId} berhasil diubah ke ${newStatus}!`, 'success');
+    });
+
+    // Escape listener untuk semua modal
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            closeDetailModal();
+            closeEditStatusModal();
+            const addModal = document.getElementById('modalOverlay');
+            if (addModal && addModal.classList.contains('show')) {
+                addModal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+
+    // viewAllAttention button
+    const viewAllAttention = document.getElementById('viewAllAttention');
+    if (viewAllAttention) {
+        viewAllAttention.addEventListener('click', () => {
+            const tableCard = document.querySelector('.table-card');
+            if (tableCard) {
+                tableCard.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    }
+}
+
+// ============================================================
+// DELETE TRANSACTION
+// ============================================================
+async function deleteTransaction(id) {
     if (confirm(`Yakin ingin menghapus transaksi #${id}?`)) {
+        if (window.LaundryDB) {
+            await LaundryDB.deleteTransaction(id);
+        }
         allTransactions = allTransactions.filter(t => t.id !== id);
         filteredTransactions = filteredTransactions.filter(t => t.id !== id);
         renderTransactions(filteredTransactions);
+        updateDashboardMetrics();
         showToast(`Transaksi #${id} berhasil dihapus`, 'success');
     }
 }
+window.deleteTransaction = deleteTransaction;
 
 // ============================================================
 // SEARCH & FILTER
@@ -326,7 +705,7 @@ function initSidebar() {
     closeBtn  && closeBtn.addEventListener('click', closeSidebar);
     overlay   && overlay.addEventListener('click', closeSidebar);
 
-    // Nav links — placeholder navigation
+    // Nav links
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', e => {
             e.preventDefault();
@@ -336,15 +715,15 @@ function initSidebar() {
             const bc = document.getElementById('breadcrumbCurrent');
             if (bc) bc.textContent = capitalize(page);
             if (window.innerWidth < 900) closeSidebar();
-            // placeholder: only dashboard implemented
             if (page !== 'dashboard') {
-                showToast(`Halaman ${capitalize(page)} segera tersedia`, 'warning');
+                showToast(`Halaman ${capitalize(page)} siap dikembangkan pada fase berikutnya!`, 'info');
             }
         });
     });
 }
 
 function capitalize(str) {
+    if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
@@ -378,7 +757,7 @@ function initNotifications() {
 }
 
 // ============================================================
-// MODAL
+// MODAL TAMBAH TRANSAKSI
 // ============================================================
 function initModal() {
     const openBtn   = document.getElementById('addTransaksiBtn');
@@ -406,36 +785,48 @@ function initModal() {
         if (e.target === overlay) closeModal();
     });
 
-    saveBtn && saveBtn.addEventListener('click', () => {
-        const pelanggan = document.getElementById('pelangganSelect').value;
-        const layanan   = document.getElementById('layananSelect').value;
-        const berat     = document.getElementById('beratInput').value;
+    saveBtn && saveBtn.addEventListener('click', async () => {
+        const pelangganSelect = document.getElementById('pelangganSelect');
+        const layananSelect   = document.getElementById('layananSelect');
+        const beratInput      = document.getElementById('beratInput');
+        const tglMasuk        = document.getElementById('tanggalMasuk');
+        const estSelesai      = document.getElementById('estimasiSelesai');
+        const catatanInput    = document.getElementById('catatanInput');
+
+        const pelanggan = pelangganSelect.value;
+        const hargaUnit = layananSelect.value;
+        const berat     = beratInput.value;
 
         if (!pelanggan) { showToast('Pilih pelanggan terlebih dahulu', 'error'); return; }
-        if (!layanan)   { showToast('Pilih layanan terlebih dahulu', 'error'); return; }
+        if (!hargaUnit) { showToast('Pilih layanan terlebih dahulu', 'error'); return; }
         if (!berat || berat < 1) { showToast('Masukkan berat atau jumlah yang valid', 'error'); return; }
 
-        // Simulate save
-        const newId  = 'TRX00' + (132 + allTransactions.length);
-        const total  = parseInt(layanan) * parseInt(berat);
+        const newId = 'TRX00' + (132 + allTransactions.length);
+        const total = parseInt(hargaUnit) * parseInt(berat);
         const newTrx = {
             id: newId,
             pelanggan,
-            layanan: document.getElementById('layananSelect').options[document.getElementById('layananSelect').selectedIndex].text.split(' (')[0],
+            telepon: '0812-3456-7890',
+            layanan: layananSelect.options[layananSelect.selectedIndex].text.split(' (')[0],
+            berat: parseInt(berat),
             total,
             statusCucian: 'Baru Masuk',
             pembayaran:   'Belum',
-            tanggal: new Date().toISOString().split('T')[0],
+            tanggal:  tglMasuk.value || new Date().toISOString().split('T')[0],
+            estimasi: estSelesai.value || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+            catatan:  catatanInput.value.trim() || '-'
         };
+
+        // Simpan ke Supabase & LocalStorage
+        if (window.LaundryDB) {
+            await LaundryDB.addTransaction(newTrx);
+        }
 
         allTransactions.unshift(newTrx);
         filteredTransactions.unshift(newTrx);
 
-        // Update summary card
-        const cardTrx = document.getElementById('cardTransaksi');
-        if (cardTrx) cardTrx.textContent = parseInt(cardTrx.textContent) + 1;
-
         renderTransactions(filteredTransactions);
+        updateDashboardMetrics();
         closeModal();
         showToast(`Transaksi #${newId} berhasil disimpan!`, 'success');
     });
@@ -460,7 +851,6 @@ function initTotalCalculation() {
     layananSel.addEventListener('change', calc);
     beratInput.addEventListener('input', calc);
 }
-// Make global for inline onchange
 window.hitungTotal = function() {};
 
 // ============================================================
@@ -501,7 +891,7 @@ function animateSummaryCards() {
 }
 
 // ============================================================
-// TOAST
+// TOAST NOTIFICATIONS
 // ============================================================
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
@@ -535,7 +925,11 @@ function showToast(message, type = 'info') {
 
 // viewAllTrx link
 document.getElementById('viewAllTrx') && document.getElementById('viewAllTrx').addEventListener('click', () => {
-    showToast('Halaman semua transaksi segera tersedia', 'info');
+    showToast('Menampilkan seluruh data transaksi pada tabel', 'info');
+    document.getElementById('searchTrx').value = '';
+    document.getElementById('filterStatus').value = '';
+    filteredTransactions = [...allTransactions];
+    renderTransactions(filteredTransactions);
 });
 
 // ============================================================
