@@ -256,7 +256,8 @@ a:hover {
     color: var(--primary);
 }
 
-.input-wrapper input {
+.input-wrapper input,
+.input-wrapper select {
     width: 100%;
     padding: 13px 16px 13px 44px;
     border: none;
@@ -266,6 +267,7 @@ a:hover {
     color: var(--text-main);
     background: transparent;
     border-radius: var(--radius-md);
+    cursor: pointer;
 }
 
 .input-wrapper input::placeholder {

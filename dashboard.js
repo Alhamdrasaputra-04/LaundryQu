@@ -64,6 +64,7 @@ let currentEditingId = null;
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     initDate();
+    initUserProfile();
     renderRevenueChart(REVENUE_7);
     renderStatusChart();
     initSidebar();
@@ -77,6 +78,24 @@ document.addEventListener('DOMContentLoaded', () => {
     animateSummaryCards();
     initDashboardData();
 });
+
+// ============================================================
+// LOGGED-IN USER PROFILE SYNC
+// ============================================================
+function initUserProfile() {
+    const user = window.LaundryAuth ? LaundryAuth.getCurrentUser() : null;
+    if (user) {
+        const nameEl = document.querySelector('.user-name');
+        const roleEl = document.querySelector('.user-role');
+        const avatarEl = document.querySelector('.user-avatar');
+        const welcomeEl = document.querySelector('.dashboard-title');
+
+        if (nameEl) nameEl.textContent = user.nama || user.email;
+        if (roleEl) roleEl.textContent = user.role === 'admin' ? 'Administrator' : 'Pelanggan / Pengguna';
+        if (avatarEl) avatarEl.textContent = (user.nama ? user.nama.charAt(0) : 'U').toUpperCase();
+        if (welcomeEl) welcomeEl.innerHTML = `Selamat Datang, ${user.nama || 'Pengguna'}! &#128075;`;
+    }
+}
 
 // ============================================================
 // DATA INITIALIZATION & SYNC

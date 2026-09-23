@@ -10,12 +10,16 @@ create table if not exists public.profiles (
     id uuid default gen_random_uuid() primary key,
     nama text not null,
     email text unique not null,
+    password text not null default '123456',
     nomor_telepon text,
     alamat text,
     role text not null default 'user' check (role in ('admin', 'user')),
     created_at timestamp with time zone default now(),
     updated_at timestamp with time zone default now()
 );
+
+-- Pastikan kolom password ada jika tabel sudah terlanjur dibuat
+alter table public.profiles add column if not exists password text default '123456';
 
 -- 3. TABEL LAYANAN (MASTER TARIF LAUNDRY)
 create table if not exists public.layanan (
@@ -134,7 +138,7 @@ insert into public.transaksi (kode_transaksi, pelanggan_nama, nomor_telepon, lay
 on conflict do nothing;
 
 -- Data Akun Profiles Awal
-insert into public.profiles (nama, email, role, nomor_telepon, alamat) values
-('Admin LaundryKu', 'admin@laundryku.com', 'admin', '08123456789', 'Outlet LaundryKu Pusat'),
-('Budi Santoso', 'budi@gmail.com', 'user', '081234567890', 'Jl. Kaliurang KM 5, Yogyakarta')
-on conflict do nothing;
+insert into public.profiles (nama, email, password, role, nomor_telepon, alamat) values
+('Admin LaundryKu', 'admin@laundryku.com', 'admin123', 'admin', '08123456789', 'Outlet LaundryKu Pusat'),
+('Budi Santoso', 'budi@gmail.com', 'budi123', 'user', '081234567890', 'Jl. Kaliurang KM 5, Yogyakarta')
+on conflict (email) do update set password = excluded.password;

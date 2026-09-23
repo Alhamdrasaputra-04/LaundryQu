@@ -7,48 +7,71 @@ const registerBtn = document.getElementById('registerBtn');
 const nameInput = document.getElementById('name');
 const regEmailInput = document.getElementById('regEmail');
 const regPasswordInput = document.getElementById('regPassword');
+const regRoleSelect = document.getElementById('regRole');
 const toggleRegPasswordBtn = document.getElementById('toggleRegPassword');
 
 // Password visibility toggle
-toggleRegPasswordBtn.addEventListener('click', function() {
-    const type = regPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    regPasswordInput.setAttribute('type', type);
-    this.innerHTML = type === 'password' 
-        ? '<svg class="eye-icon" viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>'
-        : '<svg class="eye-icon" viewBox="0 0 24 24"><path d="M17,7C14.55,7 12.5,8.55 12.5,11C12.5,11.38 12.45,11.74 12.38,12.1C11.72,11.65 10.92,11.39 10,11.39C7.22,11.39 5,13.61 5,16.39C5,19.17 7.22,21.39 10,21.39C12.78,21.39 15,19.17 15,16.39C15,15.34 14.66,14.41 14.14,13.65C14.55,13.27 14.86,12.78 15,12.29C16.25,12.92 17,14.05 17,15.39V7M12,4C9.11,4 6.6,5.9 5.25,8.71C6.85,9.64 8.85,10.16 11,10.3V8.05C10.42,7.82 9.86,7.5 9.33,7.11L12,4M17.62,10.88C16.63,10.47 15.5,10.22 14.25,10.11V12.16C15.83,12.45 17.14,13.17 18,14.19L17.62,10.88M19,14.38C19,15.31 18.79,16.17 18.44,16.95C19.16,17.37 19.75,17.95 20.23,18.65L21.38,17.5C20.44,16.36 19.91,14.95 19,14.38M12,20.39C10.25,20.39 8.69,19.78 7.56,18.78L8.69,17.66C9.5,18.35 10.53,18.79 11.75,18.93V20.39H12M4.27,5.73L5.69,7.15C6.86,6.16 8.36,5.46 10,5.16V3L4.27,5.73Z" /></svg>';
-});
+if (toggleRegPasswordBtn && regPasswordInput) {
+    toggleRegPasswordBtn.addEventListener('click', function() {
+        const type = regPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        regPasswordInput.setAttribute('type', type);
+        this.innerHTML = type === 'password' 
+            ? '<svg class="eye-icon" viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>'
+            : '<svg class="eye-icon" viewBox="0 0 24 24"><path d="M17,7C14.55,7 12.5,8.55 12.5,11C12.5,11.38 12.45,11.74 12.38,12.1C11.72,11.65 10.92,11.39 10,11.39C7.22,11.39 5,13.61 5,16.39C5,19.17 7.22,21.39 10,21.39C12.78,21.39 15,19.17 15,16.39C15,15.34 14.66,14.41 14.14,13.65C14.55,13.27 14.86,12.78 15,12.29C16.25,12.92 17,14.05 17,15.39V7M12,4C9.11,4 6.6,5.9 5.25,8.71C6.85,9.64 8.85,10.16 11,10.3V8.05C10.42,7.82 9.86,7.5 9.33,7.11L12,4M17.62,10.88C16.63,10.47 15.5,10.22 14.25,10.11V12.16C15.83,12.45 17.14,13.17 18,14.19L17.62,10.88M19,14.38C19,15.31 18.79,16.17 18.44,16.95C19.16,17.37 19.75,17.95 20.23,18.65L21.38,17.5C20.44,16.36 19.91,14.95 19,14.38M12,20.39C10.25,20.39 8.69,19.78 7.56,18.78L8.69,17.66C9.5,18.35 10.53,18.79 11.75,18.93V20.39H12M4.27,5.73L5.69,7.15C6.86,6.16 8.36,5.46 10,5.16V3L4.27,5.73Z" /></svg>';
+    });
+}
 
-// Register form submit
-registerForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const name = nameInput.value.trim();
-    const email = regEmailInput.value.trim();
-    const password = regPasswordInput.value;
-    
-    if (!name || !email || !password) {
-        showMessage('Silakan isi semua field', 'error');
-        return;
-    }
-    
-    if (!isValidEmail(email)) {
-        showMessage('Email tidak valid', 'error');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showMessage('Password minimal 6 karakter', 'error');
-        return;
-    }
-    
-    setLoading(true);
-    
-    setTimeout(function() {
-        setLoading(false);
-        showMessage('Registrasi berhasil! Silakan login.', 'success');
-        setTimeout(function() { window.location.href = 'index.html'; }, 2000);
-    }, 1500);
-});
+// Register form submit with real database registration
+if (registerForm) {
+    registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const name = nameInput.value.trim();
+        const email = regEmailInput.value.trim();
+        const password = regPasswordInput.value;
+        const role = regRoleSelect ? regRoleSelect.value : 'user';
+        
+        if (!name || !email || !password) {
+            showMessage('Silakan lengkapi semua kolom pendaftaran', 'error');
+            return;
+        }
+        
+        if (!isValidEmail(email)) {
+            showMessage('Format email tidak valid (contoh: nama@email.com)', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            showMessage('Kata sandi minimal 6 karakter demi keamanan', 'error');
+            return;
+        }
+        
+        setLoading(true);
+        
+        try {
+            if (!window.LaundryAuth) {
+                throw new Error('Modul autentikasi belum siap. Silakan muat ulang halaman.');
+            }
+
+            const res = await LaundryAuth.register(name, email, password, role);
+            setLoading(false);
+
+            if (!res.success) {
+                showMessage(res.message, 'error');
+                return;
+            }
+
+            showMessage('Registrasi berhasil! Mengalihkan ke halaman masuk...', 'success');
+            setTimeout(function() { 
+                window.location.href = 'Login.html'; 
+            }, 1800);
+
+        } catch (err) {
+            setLoading(false);
+            showMessage(err.message || 'Terjadi kesalahan sistem saat mendaftar', 'error');
+        }
+    });
+}
 
 // Helper functions
 function isValidEmail(email) {
@@ -56,14 +79,15 @@ function isValidEmail(email) {
 }
 
 function setLoading(isLoading) {
+    if (!registerBtn) return;
     if (isLoading) {
         registerBtn.classList.add('loading');
         registerBtn.disabled = true;
-        registerBtn.querySelector('.btn-text').textContent = 'Memproses...';
+        registerBtn.querySelector('.btn-text').textContent = 'Mendaftarkan...';
     } else {
         registerBtn.classList.remove('loading');
         registerBtn.disabled = false;
-        registerBtn.querySelector('.btn-text').textContent = 'Daftar';
+        registerBtn.querySelector('.btn-text').textContent = 'Daftar Akun Sekarang';
     }
 }
 
@@ -89,8 +113,3 @@ function createMessageContainer() {
     document.body.appendChild(container);
     return container;
 }
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('LaundryApp Register Loaded');
-});

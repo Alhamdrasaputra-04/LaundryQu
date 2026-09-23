@@ -30,51 +30,43 @@ const DEMO_CREDENTIALS = {
 };
 
 // ============================================
-// 3. Login Form Submit
+// 3. Login Form Submit (Strict Database Auth)
 // ============================================
-loginForm.addEventListener('submit', function(e) {
+loginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const email = emailInput.value.trim();
     const password = passwordInput.value;
     
     if (!email || !password) {
-        showMessage('Silakan isi semua field', 'error');
-        return;
-    }
-    
-    // Demo login
-    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
-        setLoading(true);
-        showMessage('Demo login berhasil! Selamat datang.', 'success');
-        localStorage.setItem('laundryUser', JSON.stringify({ 
-            email: email, 
-            name: 'Demo User',
-            isLoggedIn: true,
-            method: 'demo'
-        }));
-        setTimeout(function() { 
-            window.location.href = 'dashboard.html'; 
-        }, 1000);
-        return;
-    }
-    
-    if (!isValidEmail(email)) {
-        showMessage('Email tidak valid. Gunakan demo/demo untuk demo login.', 'error');
+        showMessage('Silakan isi email dan kata sandi', 'error');
         return;
     }
     
     setLoading(true);
     
-    // Simulasi login (akan diganti Supabase nanti)
-    setTimeout(function() {
+    try {
+        if (!window.LaundryAuth) {
+            throw new Error('Modul autentikasi belum siap. Silakan muat ulang halaman.');
+        }
+
+        const res = await LaundryAuth.login(email, password);
         setLoading(false);
-        showMessage('Login berhasil! Selamat datang.', 'success');
-        localStorage.setItem('laundryUser', JSON.stringify({ email: email, isLoggedIn: true }));
+
+        if (!res.success) {
+            showMessage(res.message, 'error');
+            return;
+        }
+
+        showMessage(`Login berhasil! Selamat datang, ${res.user.nama || 'Pengguna'}.`, 'success');
         setTimeout(function() { 
             window.location.href = 'dashboard.html'; 
-        }, 1500);
-    }, 1500);
+        }, 1200);
+
+    } catch (err) {
+        setLoading(false);
+        showMessage(err.message || 'Terjadi kesalahan saat masuk', 'error');
+    }
 });
 
 // ============================================

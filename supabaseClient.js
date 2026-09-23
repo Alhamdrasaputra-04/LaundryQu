@@ -161,8 +161,189 @@ const LaundryDB = {
         } else if (action === 'delete') {
             list = list.filter(t => t.id !== item.id);
         }
-        localStorage.setItem('laundry_transactions', JSON.stringify(list));
+    }
+};
+
+// ============================================================
+// AUTHENTICATION HELPER (SUPABASE + LOCAL FALLBACK)
+// ============================================================
+const LaundryAuth = {
+    // 1. Pendaftaran Akun Baru (Register)
+    async register(name, email, password, role = 'user') {
+        const cleanEmail = email.toLowerCase().trim();
+        
+        // Cek dulu apakah email sudah ada di Supabase
+        if (sbClient) {
+            try {
+                const { data: existing } = await sbClient
+                    .from('profiles')
+                    .select('id, email')
+                    .eq('email', cleanEmail)
+                    .maybeSingle();
+
+                if (existing) {
+                    return { success: false, message: 'Email sudah terdaftar! Silakan login menggunakan email tersebut.' };
+                }
+
+                // Simpan ke Supabase tabel profiles
+                const { data, error } = await sbClient
+                    .from('profiles')
+                    .insert([{
+                        nama: name,
+                        email: cleanEmail,
+                        password: password,
+                        role: role || 'user'
+                    }])
+                    .select();
+
+                if (error) {
+                    console.warn('Supabase register error:', error.message);
+                } else {
+                    console.log('✅ Profil pengguna tersimpan di Supabase:', data);
+                }
+            } catch (err) {
+                console.warn('Register catch error:', err.message);
+            }
+        }
+
+        // Simpan juga di localStorage sebagai backup
+        const localUsers = LaundryAuth.getLocalUsers();
+        if (localUsers.some(u => u.email === cleanEmail)) {
+            return { success: false, message: 'Email sudah terdaftar di sistem! Silakan login.' };
+        }
+        localUsers.push({ nama: name, email: cleanEmail, password: password, role: role || 'user' });
+        localStorage.setItem('laundry_registered_users', JSON.stringify(localUsers));
+
+        return { success: true, message: 'Pendaftaran berhasil! Akun Anda kini aktif.' };
+    },
+
+    // 2. Masuk ke Akun (Login dengan Validasi Ketat)
+    async login(emailOrUsername, password) {
+        const identifier = emailOrUsername.toLowerCase().trim();
+
+        // 1. Akun Cepat Demo (demo / demo)
+        if (identifier === 'demo' && password === 'demo') {
+            const demoUser = {
+                nama: 'Demo Admin',
+                email: 'demo@laundryku.com',
+                role: 'admin',
+                isLoggedIn: true
+            };
+            localStorage.setItem('laundryUser', JSON.stringify(demoUser));
+            return { success: true, user: demoUser };
+        }
+
+        // 2. Validasi ke Supabase Cloud Database
+        if (sbClient) {
+            try {
+                const { data: user, error } = await sbClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('email', identifier)
+                    .maybeSingle();
+
+                if (!error && user) {
+                    // Cek kata sandi
+                    if (user.password && user.password !== password) {
+                        return { 
+                            success: false, 
+                            message: 'Kata sandi salah! Silakan periksa kembali password Anda.' 
+                        };
+                    }
+
+                    // Jika password cocok
+                    const sessionUser = {
+                        id: user.id,
+                        nama: user.nama,
+                        email: user.email,
+                        role: user.role || 'user',
+                        isLoggedIn: true
+                    };
+                    localStorage.setItem('laundryUser', JSON.stringify(sessionUser));
+                    return { success: true, user: sessionUser };
+                }
+            } catch (err) {
+                console.warn('Supabase login check error:', err.message);
+            }
+        }
+
+        // 3. Validasi ke Local Storage (Penyimpanan Lokal)
+        const localUsers = LaundryAuth.getLocalUsers();
+        const localUser = localUsers.find(u => u.email === identifier);
+        if (localUser) {
+            if (localUser.password !== password) {
+                return { 
+                    success: false, 
+                    message: 'Kata sandi salah! Silakan periksa kembali password Anda.' 
+                };
+            }
+            const sessionUser = {
+                nama: localUser.nama,
+                email: localUser.email,
+                role: localUser.role || 'user',
+                isLoggedIn: true
+            };
+            localStorage.setItem('laundryUser', JSON.stringify(sessionUser));
+            return { success: true, user: sessionUser };
+        }
+
+        // 4. Cek Akun Default Bawaan jika baru pertama kali dijalankan
+        if (identifier === 'admin@laundryku.com') {
+            if (password === 'admin123') {
+                const adminUser = { nama: 'Admin LaundryKu', email: 'admin@laundryku.com', role: 'admin', isLoggedIn: true };
+                localStorage.setItem('laundryUser', JSON.stringify(adminUser));
+                return { success: true, user: adminUser };
+            } else {
+                return { success: false, message: 'Kata sandi salah! Silakan periksa kembali password Anda.' };
+            }
+        }
+        if (identifier === 'budi@gmail.com') {
+            if (password === 'budi123') {
+                const budiUser = { nama: 'Budi Santoso', email: 'budi@gmail.com', role: 'user', isLoggedIn: true };
+                localStorage.setItem('laundryUser', JSON.stringify(budiUser));
+                return { success: true, user: budiUser };
+            } else {
+                return { success: false, message: 'Kata sandi salah! Silakan periksa kembali password Anda.' };
+            }
+        }
+
+        // 5. Jika akun tidak ada sama sekali di database maupun lokal
+        return { 
+            success: false, 
+            message: `Akun "${identifier}" belum terdaftar. Silakan daftar akun baru terlebih dahulu.` 
+        };
+    },
+
+    // Ambil daftar user lokal
+    getLocalUsers() {
+        try {
+            const saved = localStorage.getItem('laundry_registered_users');
+            if (saved) return JSON.parse(saved);
+        } catch(e) {}
+        const defaultUsers = [
+            { nama: 'Admin LaundryKu', email: 'admin@laundryku.com', password: 'admin123', role: 'admin' },
+            { nama: 'Budi Santoso', email: 'budi@gmail.com', password: 'budi123', role: 'user' }
+        ];
+        localStorage.setItem('laundry_registered_users', JSON.stringify(defaultUsers));
+        return defaultUsers;
+    },
+
+    // Ambil user yang sedang aktif login
+    getCurrentUser() {
+        try {
+            const saved = localStorage.getItem('laundryUser');
+            return saved ? JSON.parse(saved) : null;
+        } catch(e) {
+            return null;
+        }
+    },
+
+    // Keluar (Logout)
+    logout() {
+        localStorage.removeItem('laundryUser');
+        window.location.href = 'Login.html';
     }
 };
 
 window.LaundryDB = LaundryDB;
+window.LaundryAuth = LaundryAuth;
