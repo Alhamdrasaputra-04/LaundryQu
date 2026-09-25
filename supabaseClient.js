@@ -303,16 +303,126 @@ const LaundryDB = {
                     .from('layanan')
                     .select('*')
                     .order('id', { ascending: true });
-                if (!error && data && data.length > 0) return data;
-            } catch(e){}
+                if (!error && data && data.length > 0) {
+                    return data.map(s => ({
+                        id: s.id,
+                        nama: s.nama_layanan,
+                        tarif: parseFloat(s.harga) || 0,
+                        satuan: s.satuan || 'kg',
+                        durasi: s.durasi_jam ? `${s.durasi_jam} Jam` : '2 Hari',
+                        durasi_jam: s.durasi_jam || 24,
+                        aktif: s.status === 'aktif'
+                    }));
+                }
+            } catch(e){
+                console.warn('Supabase fetch layanan error:', e.message);
+            }
         }
-        return [
-            { id: 1, nama_layanan: 'Cuci Reguler', harga: 5000, satuan: 'kg', durasi_jam: 48 },
-            { id: 2, nama_layanan: 'Cuci Express', harga: 8000, satuan: 'kg', durasi_jam: 24 },
-            { id: 3, nama_layanan: 'Cuci Setrika', harga: 10000, satuan: 'kg', durasi_jam: 48 },
-            { id: 4, nama_layanan: 'Dry Clean', harga: 15000, satuan: 'pcs', durasi_jam: 72 },
-            { id: 5, nama_layanan: 'Laundry Sepatu', harga: 20000, satuan: 'pcs', durasi_jam: 72 }
+        const local = localStorage.getItem('laundry_services');
+        if (local) {
+            try { return JSON.parse(local); } catch(e){}
+        }
+        const defaultServices = [
+            { id: 1, nama: 'Cuci Setrika', tarif: 10000, satuan: 'kg', durasi: '48 Jam', durasi_jam: 48, aktif: true },
+            { id: 2, nama: 'Cuci Reguler', tarif: 5000, satuan: 'kg', durasi: '48 Jam', durasi_jam: 48, aktif: true },
+            { id: 3, nama: 'Cuci Express', tarif: 8000, satuan: 'kg', durasi: '24 Jam', durasi_jam: 24, aktif: true },
+            { id: 4, nama: 'Dry Clean', tarif: 15000, satuan: 'pcs', durasi: '72 Jam', durasi_jam: 72, aktif: true },
+            { id: 5, nama: 'Laundry Sepatu', tarif: 20000, satuan: 'pcs', durasi: '72 Jam', durasi_jam: 72, aktif: true }
         ];
+        localStorage.setItem('laundry_services', JSON.stringify(defaultServices));
+        return defaultServices;
+    },
+
+    // 10. Tambah Layanan Baru
+    async addService(svc) {
+        let insertedId = Date.now();
+        if (sbClient) {
+            try {
+                const { data, error } = await sbClient
+                    .from('layanan')
+                    .insert([{
+                        nama_layanan: svc.nama,
+                        harga: svc.tarif,
+                        satuan: svc.satuan || 'kg',
+                        durasi_jam: parseInt(svc.durasi) || 24,
+                        status: svc.aktif ? 'aktif' : 'nonaktif'
+                    }])
+                    .select();
+                if (!error && data && data[0]) {
+                    insertedId = data[0].id;
+                }
+            } catch (err) {
+                console.warn('Supabase add layanan error:', err.message);
+            }
+        }
+        const newService = {
+            id: insertedId,
+            nama: svc.nama,
+            tarif: svc.tarif,
+            satuan: svc.satuan,
+            durasi: svc.durasi || '24 Jam',
+            aktif: svc.aktif !== false
+        };
+        LaundryDB.syncService(newService, 'add');
+        return newService;
+    },
+
+    // 11. Update Layanan
+    async updateService(id, svc) {
+        if (sbClient) {
+            try {
+                await sbClient
+                    .from('layanan')
+                    .update({
+                        nama_layanan: svc.nama,
+                        harga: svc.tarif,
+                        satuan: svc.satuan,
+                        durasi_jam: parseInt(svc.durasi) || 24,
+                        status: svc.aktif ? 'aktif' : 'nonaktif'
+                    })
+                    .eq('id', id);
+            } catch (err) {
+                console.warn('Supabase update layanan error:', err.message);
+            }
+        }
+        LaundryDB.syncService({ id, ...svc }, 'update');
+    },
+
+    // 12. Toggle Status Layanan (Aktif / Nonaktif)
+    async toggleServiceStatus(id, newStatusBool) {
+        const statusStr = newStatusBool ? 'aktif' : 'nonaktif';
+        if (sbClient) {
+            try {
+                await sbClient
+                    .from('layanan')
+                    .update({ status: statusStr })
+                    .eq('id', id);
+            } catch (err) {
+                console.warn('Supabase toggle layanan error:', err.message);
+            }
+        }
+        LaundryDB.syncService({ id, aktif: newStatusBool }, 'update');
+    },
+
+    // Helper Sinkronisasi Layanan LocalStorage
+    syncService(item, action) {
+        let list = [];
+        try {
+            const stored = localStorage.getItem('laundry_services');
+            list = stored ? JSON.parse(stored) : [];
+        } catch(e) { list = []; }
+
+        if (action === 'add') {
+            list.push(item);
+        } else if (action === 'update') {
+            const idx = list.findIndex(s => String(s.id) === String(item.id));
+            if (idx !== -1) {
+                list[idx] = { ...list[idx], ...item };
+            }
+        } else if (action === 'delete') {
+            list = list.filter(s => String(s.id) !== String(item.id));
+        }
+        localStorage.setItem('laundry_services', JSON.stringify(list));
     }
 };
 
@@ -508,6 +618,55 @@ const LaundryAuth = {
     logout() {
         localStorage.removeItem('laundryUser');
         window.location.href = 'Login.html';
+    },
+
+    // Perbarui Nama Profil
+    async updateProfileName(email, newName) {
+        if (sbClient) {
+            try {
+                await sbClient
+                    .from('profiles')
+                    .update({ nama: newName })
+                    .eq('email', email);
+            } catch(e) {
+                console.warn('Supabase update profile error:', e.message);
+            }
+        }
+        try {
+            const cur = LaundryAuth.getCurrentUser();
+            if (cur) {
+                cur.nama = newName;
+                localStorage.setItem('laundryUser', JSON.stringify(cur));
+            }
+            const regUsers = LaundryAuth.getLocalUsers();
+            const idx = regUsers.findIndex(u => u.email === email);
+            if (idx !== -1) {
+                regUsers[idx].nama = newName;
+                localStorage.setItem('laundry_registered_users', JSON.stringify(regUsers));
+            }
+        } catch(e){}
+    },
+
+    // Perbarui Password Pengguna
+    async updatePassword(email, newPassword) {
+        if (sbClient) {
+            try {
+                await sbClient
+                    .from('profiles')
+                    .update({ password: newPassword })
+                    .eq('email', email);
+            } catch(e) {
+                console.warn('Supabase update password error:', e.message);
+            }
+        }
+        try {
+            const regUsers = LaundryAuth.getLocalUsers();
+            const idx = regUsers.findIndex(u => u.email === email);
+            if (idx !== -1) {
+                regUsers[idx].password = newPassword;
+                localStorage.setItem('laundry_registered_users', JSON.stringify(regUsers));
+            }
+        } catch(e){}
     }
 };
 

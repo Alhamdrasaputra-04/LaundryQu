@@ -57,6 +57,7 @@ body {
     color: var(--text-1);
     display: flex;
     min-height: 100vh;
+    width: 100%;
     overflow-x: hidden;
 }
 a { text-decoration: none; color: inherit; }
@@ -64,6 +65,16 @@ ul { list-style: none; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 input, select, textarea { font-family: inherit; }
 svg { display: block; }
+
+/* ============================================================
+   APP LAYOUT WRAPPER
+   ============================================================ */
+.app-layout {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex: 1;
+}
 
 /* ============================================================
    SIDEBAR
@@ -95,8 +106,16 @@ svg { display: block; }
     gap: 12px;
 }
 
+.logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon,
 .logo-icon-wrap {
     width: 40px; height: 40px;
+    max-width: 40px; max-height: 40px;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     border-radius: var(--radius-md);
     display: flex;
@@ -105,15 +124,30 @@ svg { display: block; }
     flex-shrink: 0;
     box-shadow: 0 4px 12px rgba(235,127,49,0.4);
 }
+.logo-icon svg,
 .logo-icon-wrap svg {
     width: 22px; height: 22px;
+    max-width: 22px; max-height: 22px;
     fill: white;
+}
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 .logo-name {
     font-size: 18px;
     font-weight: 700;
     color: white;
     letter-spacing: -0.3px;
+    line-height: 1.2;
+}
+.logo-tag {
+    font-size: 11px;
+    font-weight: 500;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
 }
 
 .sidebar-close {
@@ -233,6 +267,8 @@ svg { display: block; }
 .main-content {
     margin-left: var(--sidebar-width);
     flex: 1;
+    width: calc(100% - var(--sidebar-width));
+    min-width: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -826,6 +862,39 @@ svg { display: block; }
     transition: var(--transition);
 }
 .filter-select:focus { border-color: var(--primary); }
+
+/* General Search Box Helper */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.search-box svg {
+    position: absolute;
+    left: 12px;
+    width: 18px;
+    height: 18px;
+    max-width: 18px;
+    max-height: 18px;
+    fill: var(--text-3);
+    pointer-events: none;
+}
+.search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-1);
+    background: var(--bg);
+    outline: none;
+    transition: var(--transition);
+}
+.search-box input:focus {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(235,127,49,0.12);
+}
 
 .table-wrap { overflow-x: auto; }
 .data-table {

@@ -112,17 +112,16 @@ function initOutletProfile() {
 // ============================================================
 // TAB 2: MASTER SERVICES & TARIFFS (PHASE 2)
 // ============================================================
-function initServices() {
-    const stored = localStorage.getItem('laundry_services');
-    if (stored) {
-        try {
-            servicesList = JSON.parse(stored);
-        } catch(e) {
-            servicesList = [...DEFAULT_SERVICES];
+async function initServices() {
+    try {
+        if (window.LaundryDB && LaundryDB.getServices) {
+            servicesList = await LaundryDB.getServices();
+        } else {
+            const stored = localStorage.getItem('laundry_services');
+            servicesList = stored ? JSON.parse(stored) : [...DEFAULT_SERVICES];
         }
-    } else {
+    } catch(e) {
         servicesList = [...DEFAULT_SERVICES];
-        localStorage.setItem('laundry_services', JSON.stringify(servicesList));
     }
 
     renderServicesTable();
@@ -160,34 +159,53 @@ function initServices() {
     cancelBtn && cancelBtn.addEventListener('click', closeModal);
     overlay && overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 
-    saveBtn && saveBtn.addEventListener('click', () => {
+    saveBtn && saveBtn.addEventListener('click', async () => {
         const editId = document.getElementById('serviceEditId').value;
         const nama = document.getElementById('inputServiceName').value.trim();
         const tarif = parseInt(document.getElementById('inputServicePrice').value, 10);
         const satuan = document.getElementById('inputServiceUnit').value;
-        const durasi = document.getElementById('inputServiceDuration').value.trim() || '1-2 Hari';
+        const durasi = document.getElementById('inputServiceDuration').value.trim() || '24 Jam';
 
         if (!nama) { showToast('Nama layanan wajib diisi', 'error'); return; }
         if (!tarif || tarif < 500) { showToast('Masukkan tarif yang valid', 'error'); return; }
 
-        if (editId) {
-            const idx = servicesList.findIndex(s => s.id == editId);
-            if (idx !== -1) {
-                servicesList[idx].nama = nama;
-                servicesList[idx].tarif = tarif;
-                servicesList[idx].satuan = satuan;
-                servicesList[idx].durasi = durasi;
-            }
-            showToast(`Layanan ${nama} berhasil diperbarui!`, 'success');
-        } else {
-            const newId = Date.now();
-            servicesList.push({ id: newId, nama, tarif, satuan, durasi, aktif: true });
-            showToast(`Layanan baru ${nama} berhasil ditambahkan!`, 'success');
-        }
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Menyimpan...';
 
-        localStorage.setItem('laundry_services', JSON.stringify(servicesList));
-        renderServicesTable();
-        closeModal();
+        try {
+            if (editId) {
+                if (window.LaundryDB && LaundryDB.updateService) {
+                    await LaundryDB.updateService(editId, { nama, tarif, satuan, durasi, aktif: true });
+                } else {
+                    const idx = servicesList.findIndex(s => String(s.id) === String(editId));
+                    if (idx !== -1) {
+                        servicesList[idx] = { ...servicesList[idx], nama, tarif, satuan, durasi };
+                        localStorage.setItem('laundry_services', JSON.stringify(servicesList));
+                    }
+                }
+                showToast(`Layanan "${nama}" berhasil diperbarui di database!`, 'success');
+            } else {
+                if (window.LaundryDB && LaundryDB.addService) {
+                    await LaundryDB.addService({ nama, tarif, satuan, durasi, aktif: true });
+                } else {
+                    const newId = Date.now();
+                    servicesList.push({ id: newId, nama, tarif, satuan, durasi, aktif: true });
+                    localStorage.setItem('laundry_services', JSON.stringify(servicesList));
+                }
+                showToast(`Layanan baru "${nama}" berhasil ditambahkan ke database!`, 'success');
+            }
+
+            if (window.LaundryDB && LaundryDB.getServices) {
+                servicesList = await LaundryDB.getServices();
+            }
+            renderServicesTable();
+            closeModal();
+        } catch (err) {
+            showToast('Gagal menyimpan layanan: ' + err.message, 'error');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Simpan Layanan';
+        }
     });
 }
 
@@ -195,7 +213,7 @@ function renderServicesTable() {
     const tbody = document.getElementById('serviceTbody');
     if (!tbody) return;
 
-    if (servicesList.length === 0) {
+    if (!servicesList || servicesList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:#94A3B8;">Belum ada master layanan</td></tr>`;
         return;
     }
@@ -213,10 +231,10 @@ function renderServicesTable() {
             </td>
             <td>
                 <div style="display:flex; gap:6px;">
-                    <button class="action-btn edit" onclick="editService(${item.id})" title="Edit Tarif">
+                    <button class="action-btn edit" onclick="editService('${item.id}')" title="Edit Tarif">
                         <svg viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
                     </button>
-                    <button class="action-btn delete" onclick="toggleServiceStatus(${item.id})" title="${item.aktif ? 'Nonaktifkan' : 'Aktifkan'}">
+                    <button class="action-btn delete" onclick="toggleServiceStatus('${item.id}')" title="${item.aktif ? 'Nonaktifkan' : 'Aktifkan'}">
                         <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z"/></svg>
                     </button>
                 </div>
@@ -226,7 +244,7 @@ function renderServicesTable() {
 }
 
 window.editService = function(id) {
-    const item = servicesList.find(s => s.id == id);
+    const item = servicesList.find(s => String(s.id) === String(id));
     if (!item) return;
     const overlay = document.getElementById('serviceModalOverlay');
     document.getElementById('serviceModalTitle').textContent = 'Edit Layanan';
@@ -239,13 +257,24 @@ window.editService = function(id) {
     document.body.style.overflow = 'hidden';
 };
 
-window.toggleServiceStatus = function(id) {
-    const item = servicesList.find(s => s.id == id);
+window.toggleServiceStatus = async function(id) {
+    const item = servicesList.find(s => String(s.id) === String(id));
     if (!item) return;
-    item.aktif = !item.aktif;
-    localStorage.setItem('laundry_services', JSON.stringify(servicesList));
-    renderServicesTable();
-    showToast(`Status layanan ${item.nama} diubah ke ${item.aktif ? 'Aktif' : 'Nonaktif'}`, 'info');
+    const newActive = !item.aktif;
+
+    try {
+        if (window.LaundryDB && LaundryDB.toggleServiceStatus) {
+            await LaundryDB.toggleServiceStatus(id, newActive);
+            servicesList = await LaundryDB.getServices();
+        } else {
+            item.aktif = newActive;
+            localStorage.setItem('laundry_services', JSON.stringify(servicesList));
+        }
+        renderServicesTable();
+        showToast(`Status layanan "${item.nama}" diubah ke ${newActive ? 'Aktif' : 'Nonaktif'} (Tersimpan)`, 'info');
+    } catch (e) {
+        showToast('Gagal mengubah status layanan', 'error');
+    }
 };
 
 // ============================================================
@@ -253,20 +282,32 @@ window.toggleServiceStatus = function(id) {
 // ============================================================
 function initAccountSettings() {
     const btnSaveName = document.getElementById('btnSaveAdminName');
-    btnSaveName && btnSaveName.addEventListener('click', () => {
+    btnSaveName && btnSaveName.addEventListener('click', async () => {
         const newName = document.getElementById('adminNama').value.trim();
         if (!newName) { showToast('Nama tidak boleh kosong', 'error'); return; }
 
         const currentUser = window.LaundryAuth ? LaundryAuth.getCurrentUser() : null;
-        if (currentUser) {
-            currentUser.nama = newName;
-            localStorage.setItem('laundry_user_session', JSON.stringify(currentUser));
+        if (currentUser && currentUser.email) {
+            btnSaveName.disabled = true;
+            btnSaveName.textContent = 'Menyimpan...';
+            try {
+                if (LaundryAuth.updateProfileName) {
+                    await LaundryAuth.updateProfileName(currentUser.email, newName);
+                } else {
+                    currentUser.nama = newName;
+                    localStorage.setItem('laundryUser', JSON.stringify(currentUser));
+                }
+                showToast('Nama profil admin berhasil diperbarui di database!', 'success');
+            } catch(e) {
+                showToast('Gagal memperbarui profil: ' + e.message, 'error');
+            } finally {
+                btnSaveName.disabled = false;
+                btnSaveName.textContent = 'Perbarui Nama Profil';
+            }
         }
 
         const topName = document.querySelector('.user-name');
         if (topName) topName.textContent = newName;
-
-        showToast('Nama profil admin berhasil diperbarui!', 'success');
     });
 
     const btnChangePass = document.getElementById('btnChangePassword');
@@ -285,17 +326,22 @@ function initAccountSettings() {
 
         const currentUser = window.LaundryAuth ? LaundryAuth.getCurrentUser() : null;
         if (currentUser && currentUser.email) {
-            // Update di supabase profiles jika ada client
-            if (typeof sbClient !== 'undefined' && sbClient) {
-                try {
-                    await sbClient.from('profiles').update({ password: p1 }).eq('email', currentUser.email);
-                } catch(e) {}
+            btnChangePass.disabled = true;
+            btnChangePass.textContent = 'Menyimpan ke Database...';
+            try {
+                if (LaundryAuth.updatePassword) {
+                    await LaundryAuth.updatePassword(currentUser.email, p1);
+                }
+                document.getElementById('inputNewPassword').value = '';
+                document.getElementById('inputConfirmPassword').value = '';
+                showToast('Password baru berhasil disimpan dengan aman ke database!', 'success');
+            } catch(e) {
+                showToast('Gagal menyimpan password: ' + e.message, 'error');
+            } finally {
+                btnChangePass.disabled = false;
+                btnChangePass.textContent = 'Simpan Password Baru';
             }
         }
-
-        document.getElementById('inputNewPassword').value = '';
-        document.getElementById('inputConfirmPassword').value = '';
-        showToast('Password baru berhasil disimpan dengan aman!', 'success');
     });
 }
 
@@ -305,19 +351,51 @@ function initAccountSettings() {
 function initDatabaseDiagnostics() {
     const btnSync = document.getElementById('btnSyncDatabase');
     const btnReset = document.getElementById('btnResetCache');
+    const badge = document.getElementById('supabaseStatusBadge');
+
+    // Uji koneksi awal
+    checkDatabaseConnection();
+
+    async function checkDatabaseConnection() {
+        if (!badge) return;
+        try {
+            const start = performance.now();
+            if (typeof sbClient !== 'undefined' && sbClient) {
+                const { data, error } = await sbClient.from('profiles').select('id').limit(1);
+                const latency = Math.round(performance.now() - start);
+                if (!error) {
+                    badge.innerHTML = `<span class="status-dot-ok"></span> Terhubung Cloud (${latency}ms)`;
+                    badge.className = 'status-pill-ok';
+                    return;
+                }
+            }
+            badge.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block;"></span> Mode Fallback Lokal`;
+            badge.style.background = '#FFFBEB';
+            badge.style.color = '#B45309';
+        } catch(e) {
+            badge.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block;"></span> Offline`;
+            badge.style.background = '#FEF2F2';
+            badge.style.color = '#DC2626';
+        }
+    }
 
     btnSync && btnSync.addEventListener('click', async () => {
         btnSync.disabled = true;
         btnSync.textContent = 'Memeriksa koneksi...';
         try {
             if (window.LaundryDB) {
-                const trxs = await LaundryDB.getTransactions();
-                showToast(`Sinkronisasi berhasil! Terhubung dengan ${(trxs || []).length} transaksi`, 'success');
+                const [trxs, svcs, custs] = await Promise.all([
+                    LaundryDB.getTransactions ? LaundryDB.getTransactions() : [],
+                    LaundryDB.getServices ? LaundryDB.getServices() : [],
+                    LaundryDB.getCustomers ? LaundryDB.getCustomers() : []
+                ]);
+                checkDatabaseConnection();
+                showToast(`Sinkronisasi berhasil! Cloud memuat: ${(trxs || []).length} transaksi, ${(svcs || []).length} layanan, ${(custs || []).length} pelanggan`, 'success');
             } else {
                 showToast('Koneksi database offline / lokal aktif', 'info');
             }
         } catch (e) {
-            showToast('Gagal terhubung ke database cloud', 'error');
+            showToast('Gagal terhubung ke database cloud: ' + e.message, 'error');
         } finally {
             btnSync.disabled = false;
             btnSync.innerHTML = `<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M12,18A6,6 0 0,1 6,12C6,11 6.25,10.03 6.7,9.2L5.24,7.74C4.46,8.97 4,10.43 4,12A8,8 0 0,0 12,20V23L16,19L12,15M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13 17.75,13.97 17.3,14.8L18.76,16.26C19.54,15.03 20,13.57 20,12A8,8 0 0,0 12,4Z"/></svg> Uji Sinkronisasi Cloud`;
@@ -325,12 +403,13 @@ function initDatabaseDiagnostics() {
     });
 
     btnReset && btnReset.addEventListener('click', () => {
-        if (confirm('Yakin ingin mereset cache lokal ke kondisi awal? Transaksi yang belum disimpan ke Supabase dapat terhapus.')) {
+        if (confirm('Yakin ingin mereset cache lokal ke kondisi awal? Data di Supabase Cloud tetap aman.')) {
             localStorage.removeItem('laundry_transactions');
             localStorage.removeItem('laundry_services');
+            localStorage.removeItem('laundry_customers');
             localStorage.removeItem('laundry_outlet_profile');
             showToast('Cache lokal berhasil dibersihkan!', 'success');
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(() => location.reload(), 800);
         }
     });
 }

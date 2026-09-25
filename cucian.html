@@ -41,30 +41,33 @@
 
         .kanban-container {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             overflow-x: auto;
             padding-bottom: 24px;
             min-height: calc(100vh - 250px);
             align-items: flex-start;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
         .kanban-container::-webkit-scrollbar {
-            height: 8px;
+            height: 10px;
         }
         .kanban-container::-webkit-scrollbar-track {
-            background: #F1F5F9;
-            border-radius: 4px;
+            background: #E2E8F0;
+            border-radius: 6px;
         }
         .kanban-container::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 4px;
+            background: #FCAD38;
+            border-radius: 6px;
         }
         .kanban-container::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
+            background: #EB7F31;
         }
 
         .kanban-col {
-            flex: 0 0 290px;
-            min-width: 290px;
+            flex: 1 1 220px;
+            min-width: 215px;
+            max-width: 320px;
             background: #F8FAFC;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-light);
@@ -72,6 +75,7 @@
             flex-direction: column;
             max-height: calc(100vh - 220px);
             transition: var(--transition);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
         .kanban-col.col-hidden {
             display: none !important;
@@ -323,10 +327,7 @@
         <!-- ===== SIDEBAR ===== -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="logo-wrap">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24"><path d="M6.5,2H17.5A1.5,1.5 0 0,1 19,3.5V5H5V3.5A1.5,1.5 0 0,1 6.5,2M5,6H19V7.5A1.5,1.5 0 0,1 17.5,9H6.5A1.5,1.5 0 0,1 5,7.5V6M4,10H20A2,2 0 0,1 22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A2,2 0 0,1 4,10M12,12A4,4 0 0,0 8,16A4,4 0 0,0 12,20A4,4 0 0,0 16,16A4,4 0 0,0 12,12M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z"/></svg>
-                    </div>
+                <div class="sidebar-logo">
                     <div class="logo-text">
                         <span class="logo-name">LaundryKu</span>
                         <span class="logo-tag">Management System</span>
@@ -451,13 +452,13 @@
                         <p class="page-subtitle">Pantau workstation cucian dan majukan tahapan pengerjaan dengan 1-klik</p>
                     </div>
                     <div style="display:flex; align-items:center; gap:12px;">
-                        <div class="search-box" style="margin-bottom:0;">
+                        <div class="search-box" style="width: 250px; margin-bottom:0;">
                             <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
                             <input type="text" id="searchKanban" placeholder="Cari pelanggan / #TRX...">
                         </div>
                         <a href="transaksi.html" class="btn-primary" style="text-decoration:none;">
                             <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
-                            + Transaksi Baru
+                            <span>Transaksi Baru</span>
                         </a>
                     </div>
                 </div>

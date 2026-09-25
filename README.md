@@ -31,6 +31,7 @@ Prototipe aplikasi web manajemen laundry modern untuk pengelolaan transaksi, pel
 ├── dashboard.js         # Logika dashboard, grafik chart, & data transaksi
 ├── assets/
 │   └── login-hero.jpg   # Aset ilustrasi visual 3D laundry
+├── MASTER_DOCUMENTATION.md # Dokumen terpadu induk (Frontend & Backend terintegrasi)
 ├── LAUNDRY_APP_DEVELOPMENT_PLAN.md  # Dokumen rencana induk pengembangan
 └── AUTH_ROLE_BASED_PLAN.md         # Dokumen rencana autentikasi multi-role
 ```

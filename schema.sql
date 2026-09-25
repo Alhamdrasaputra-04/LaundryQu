@@ -46,6 +46,7 @@ create table if not exists public.pelanggan (
 create table if not exists public.transaksi (
     id bigserial primary key,
     kode_transaksi text unique not null,
+    user_id uuid references public.profiles(id) on delete set null,
     pelanggan_id bigint references public.pelanggan(id) on delete set null,
     pelanggan_nama text not null,
     nomor_telepon text,
@@ -63,6 +64,9 @@ create table if not exists public.transaksi (
     updated_at timestamp with time zone default now()
 );
 
+-- Pastikan kolom user_id ada jika tabel sudah terlanjur dibuat sebelumnya
+alter table public.transaksi add column if not exists user_id uuid references public.profiles(id);
+
 -- 6. TABEL RIWAYAT STATUS (HISTORI TIMELINE TRACKING)
 create table if not exists public.riwayat_status (
     id bigserial primary key,
@@ -70,6 +74,18 @@ create table if not exists public.riwayat_status (
     status text not null,
     waktu timestamp with time zone default now(),
     catatan text
+);
+
+-- 7. TABEL PENGATURAN OUTLET (PROFIL TOKO & FOOTER NOTA)
+create table if not exists public.pengaturan_outlet (
+    id integer primary key default 1,
+    nama_outlet text default 'LaundryKu',
+    slogan text default 'Bersih, Wangi & Terpercaya',
+    nomor_wa text default '081234567890',
+    jam_operasional text default '07:00 - 21:00 WIB',
+    alamat text default 'Jl. Kampus No. 12, Limau Manis, Padang',
+    footer_nota text default 'Terima kasih atas kepercayaannya! Cucian Anda aman bersama kami.',
+    updated_at timestamp with time zone default now()
 );
 
 -- ============================================================
@@ -80,6 +96,7 @@ alter table public.layanan enable row level security;
 alter table public.pelanggan enable row level security;
 alter table public.transaksi enable row level security;
 alter table public.riwayat_status enable row level security;
+alter table public.pengaturan_outlet enable row level security;
 
 -- Izinkan akses untuk prototipe (anon key dapat membaca & mengubah data)
 drop policy if exists "Allow anon read all" on public.profiles;
@@ -98,6 +115,9 @@ create policy "Allow anon all transaksi" on public.transaksi for all using (true
 
 drop policy if exists "Allow anon all riwayat" on public.riwayat_status;
 create policy "Allow anon all riwayat" on public.riwayat_status for all using (true) with check (true);
+
+drop policy if exists "Allow anon all outlet" on public.pengaturan_outlet;
+create policy "Allow anon all outlet" on public.pengaturan_outlet for all using (true) with check (true);
 
 -- ============================================================
 -- DATA AWAL (SEED DATA CONTOH)
@@ -135,10 +155,23 @@ insert into public.transaksi (kode_transaksi, pelanggan_nama, nomor_telepon, lay
 ('TRX00124', 'Eko Prasetyo', '081900112233', 'Cuci Reguler', 5, 25000, 'Selesai', 'Lunas', current_date - interval '3 days', current_date - interval '1 day', 'Sudah diambil pelanggan'),
 ('TRX00123', 'Siti Rahayu', '081398765432', 'Cuci Setrika', 5, 50000, 'Selesai', 'Lunas', current_date - interval '3 days', current_date - interval '1 day', 'Selesai diambil'),
 ('TRX00122', 'Dewi Lestari', '085711223344', 'Cuci Express', 6, 48000, 'Baru Masuk', 'Belum', current_date, current_date + interval '1 day', 'Kaos dan celana olahraga')
-on conflict do nothing;
+on conflict (kode_transaksi) do nothing;
 
 -- Data Akun Profiles Awal
 insert into public.profiles (nama, email, password, role, nomor_telepon, alamat) values
 ('Admin LaundryKu', 'admin@laundryku.com', 'admin123', 'admin', '08123456789', 'Outlet LaundryKu Pusat'),
 ('Budi Santoso', 'budi@gmail.com', 'budi123', 'user', '081234567890', 'Jl. Kaliurang KM 5, Yogyakarta')
 on conflict (email) do update set password = excluded.password;
+
+-- Data Profil Usaha Outlet Awal
+insert into public.pengaturan_outlet (id, nama_outlet, slogan, nomor_wa, jam_operasional, alamat, footer_nota) values
+(1, 'LaundryKu', 'Bersih, Wangi & Terpercaya', '081234567890', '07:00 - 21:00 WIB', 'Jl. Kampus No. 12, Limau Manis, Padang', 'Terima kasih atas kepercayaannya! Cucian Anda aman bersama kami.')
+on conflict (id) do update set 
+    nama_outlet = excluded.nama_outlet,
+    slogan = excluded.slogan,
+    nomor_wa = excluded.nomor_wa,
+    jam_operasional = excluded.jam_operasional,
+    alamat = excluded.alamat,
+    footer_nota = excluded.footer_nota,
+    updated_at = now();
+

@@ -1,8 +1,9 @@
 # Alur Aplikasi LaundryKu
 
-Dokumen alur lengkap dapat dilihat pada:
-1. **[LAUNDRY_APP_DEVELOPMENT_PLAN.md](file:///d:/KULIAH/Login/LAUNDRY_APP_DEVELOPMENT_PLAN.md)** — Rencana induk fitur aplikasi (Phase 1–6).
-2. **[AUTH_ROLE_BASED_PLAN.md](file:///d:/KULIAH/Login/AUTH_ROLE_BASED_PLAN.md)** — Rencana autentikasi 2 jalur (Admin vs User/Pelanggan).
+Dokumen alur lengkap dan terpadu dapat dilihat pada:
+- **[MASTER_DOCUMENTATION.md](file:///d:/KULIAH/Login/MASTER_DOCUMENTATION.md)** — Dokumen Master Terpadu (Frontend & Backend).
+- **[LAUNDRY_APP_DEVELOPMENT_PLAN.md](file:///d:/KULIAH/Login/LAUNDRY_APP_DEVELOPMENT_PLAN.md)** — Rencana induk fitur aplikasi (Phase 1–6).
+- **[AUTH_ROLE_BASED_PLAN.md](file:///d:/KULIAH/Login/AUTH_ROLE_BASED_PLAN.md)** — Rencana autentikasi 2 jalur (Admin vs User/Pelanggan).
 
 ---
 
