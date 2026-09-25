@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaundryKu - Portal Pelanggan & Tracking Cucian</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="dashboard-user.css">
+</head>
+<body>
+
+    <!-- ================= NAVBAR PELANGGAN ================= -->
+    <nav class="user-navbar">
+        <div class="user-nav-container">
+            <a href="dashboard-user.html" class="user-brand">
+                <span class="user-brand-text">LaundryKu</span>
+                <span class="user-brand-pill">Portal Pelanggan</span>
+            </a>
+
+            <div class="user-nav-actions">
+                <!-- WhatsApp Outlet Contact Button -->
+                <a href="#" id="btnWhatsAppOutlet" target="_blank" class="btn-contact-outlet" title="Chat WhatsApp Kasir">
+                    <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>
+                    <span>Hubungi Kasir</span>
+                </a>
+
+                <!-- User Profile Pill -->
+                <div class="user-profile-badge">
+                    <div class="user-avatar" id="userAvatarText">U</div>
+                    <div class="user-profile-info">
+                        <span class="user-name-title" id="userNameDisplay">Pelanggan</span>
+                        <span class="user-role-sub" id="userEmailDisplay">pelanggan@email.com</span>
+                    </div>
+                </div>
+
+                <!-- Logout Button -->
+                <button type="button" class="btn-logout" id="btnLogoutUser" title="Keluar dari akun">
+                    <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z"/></svg>
+                    <span>Keluar</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= KONTEN UTAMA ================= -->
+    <main class="user-main-container">
+        <!-- Welcome Banner -->
+        <div class="user-welcome-banner">
+            <div>
+                <h1 class="user-welcome-title" id="welcomeTitle">Selamat Datang! 👋</h1>
+                <p class="user-welcome-sub">Pantau proses pengerjaan cucian Anda secara real-time dan transparan.</p>
+            </div>
+            <div>
+                <button type="button" class="outlet-badge-info" id="btnOpenOutletInfo">
+                    <span>📍</span>
+                    <span id="outletNameTag">LaundryKu Pusat</span>
+                    <span style="color:#94A3B8;">&bull; Info Lokasi</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- HERO: LIVE TRACKING TIMELINE AKTIF -->
+        <div id="liveTrackingContainer">
+            <!-- Akan diisi otomatis oleh dashboard-user.js -->
+        </div>
+
+        <!-- 4 SUMMARY METRIC CARDS -->
+        <div class="user-metric-grid">
+            <div class="user-metric-card">
+                <div class="um-icon-wrap orange">
+                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>
+                </div>
+                <div>
+                    <div class="um-label">Sedang Diproses</div>
+                    <div class="um-val" id="valDiproses">0</div>
+                </div>
+            </div>
+
+            <div class="user-metric-card">
+                <div class="um-icon-wrap green">
+                    <svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>
+                </div>
+                <div>
+                    <div class="um-label">Siap Diambil</div>
+                    <div class="um-val" id="valSiap" style="color:var(--success);">0</div>
+                </div>
+            </div>
+
+            <div class="user-metric-card">
+                <div class="um-icon-wrap amber">
+                    <svg viewBox="0 0 24 24"><path d="M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4M20,8L12,13L4,8V6L12,11L20,6V8Z"/></svg>
+                </div>
+                <div>
+                    <div class="um-label">Tagihan Belum Lunas</div>
+                    <div class="um-val" id="valTagihan" style="color:var(--danger);">Rp 0</div>
+                </div>
+            </div>
+
+            <div class="user-metric-card">
+                <div class="um-icon-wrap blue">
+                    <svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19M17,17H7V15H17V17M17,13H7V11H17V13M17,9H7V7H17V9Z"/></svg>
+                </div>
+                <div>
+                    <div class="um-label">Total Pesanan Saya</div>
+                    <div class="um-val" id="valTotalPesanan">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABEL RIWAYAT TRANSAKSI SAYA -->
+        <div class="user-table-card">
+            <div class="utc-header">
+                <div class="utc-title">
+                    <svg style="width:20px;height:20px;fill:var(--primary);" viewBox="0 0 24 24"><path d="M13.5,8H11V13L15.28,15.54L16,14.33L12.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/></svg>
+                    <span>Riwayat Pesanan Laundry Saya</span>
+                </div>
+                <div>
+                    <input type="text" id="searchUserOrders" placeholder="Cari kode nota / layanan..." style="padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-full);font-size:12.5px;outline:none;width:240px;">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>No. Nota</th>
+                            <th>Tanggal Masuk</th>
+                            <th>Estimasi Selesai</th>
+                            <th>Layanan & Berat</th>
+                            <th>Total Tagihan</th>
+                            <th>Status Bayar</th>
+                            <th>Status Cucian</th>
+                            <th style="text-align:right;">Struk Digital</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userOrdersTbody">
+                        <!-- Diisi otomatis oleh dashboard-user.js -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= MODAL STRUK DIGITAL ================= -->
+    <div class="modal-overlay" id="receiptModalOverlay">
+        <div class="receipt-modal-container">
+            <div class="modal-header">
+                <span class="modal-title">Struk Nota Digital</span>
+                <button type="button" class="modal-close" id="closeReceiptModal">&times;</button>
+            </div>
+            <div id="printableReceiptBox">
+                <!-- Diisi otomatis oleh openReceipt -->
+            </div>
+            <div style="padding:16px 20px; display:flex; justify-content:flex-end; gap:10px; background:#F8FAFC; border-top:1px solid #E2E8F0;">
+                <button type="button" class="btn-cancel" id="closeReceiptBtn">Tutup</button>
+                <button type="button" class="btn-save" onclick="window.print()">
+                    <svg style="width:14px;height:14px;fill:white;" viewBox="0 0 24 24"><path d="M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V15H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z"/></svg>
+                    Cetak / Simpan PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL INFO OUTLET ================= -->
+    <div class="modal-overlay" id="outletModalOverlay">
+        <div class="modal-card" style="max-width:480px;">
+            <div class="modal-header">
+                <span class="modal-title">Informasi & Lokasi Outlet</span>
+                <button type="button" class="modal-close" id="closeOutletModal">&times;</button>
+            </div>
+            <div class="modal-body" id="outletModalBody">
+                <!-- Diisi otomatis oleh dashboard-user.js -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-save" id="btnOkOutletModal" style="width:100%;">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="dashboard-user.js"></script>
+</body>
+</html>

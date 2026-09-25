@@ -23,12 +23,16 @@ Prototipe aplikasi web manajemen laundry modern untuk pengelolaan transaksi, pel
 ├── Login.html           # Halaman login utama (Split-Screen)
 ├── index.html           # Entry point aplikasi / root
 ├── login.css            # Styling halaman login & registrasi
-├── login.js             # Logika autentikasi dan validasi login
+├── login.js             # Logika autentikasi dan validasi login (Multi-Role)
 ├── register.html        # Halaman pendaftaran akun pengguna
 ├── register.js          # Logika pendaftaran pengguna
-├── dashboard.html       # Halaman dashboard admin laundry
-├── dashboard.css        # Styling dashboard terpadu
-├── dashboard.js         # Logika dashboard, grafik chart, & data transaksi
+├── dashboard.html       # Halaman dashboard admin laundry (Kasir & Operasional)
+├── dashboard.css        # Styling dashboard admin
+├── dashboard.js         # Logika dashboard admin, grafik chart, & data transaksi
+├── dashboard-user.html  # Halaman portal pelanggan (Live Tracking & Struk Digital)
+├── dashboard-user.css   # Styling portal pelanggan responsif
+├── dashboard-user.js    # Logika pelacakan cucian, riwayat, & struk pelanggan
+├── supabaseClient.js    # Konektor database Supabase & Autentikasi multi-role
 ├── assets/
 │   └── login-hero.jpg   # Aset ilustrasi visual 3D laundry
 ├── MASTER_DOCUMENTATION.md # Dokumen terpadu induk (Frontend & Backend terintegrasi)
@@ -48,6 +52,12 @@ Prototipe aplikasi web manajemen laundry modern untuk pengelolaan transaksi, pel
    ```
    Atau cukup buka file `Login.html` langsung di browser Anda.
 
-## 👤 Akun Demo
-- **Email/Username**: `demo`
-- **Password**: `demo`
+## 👤 Akun Demo Uji Coba
+- **Mode Admin (Pengelola / Kasir)**:
+  - Username: `admin` (atau `demo`)
+  - Password: `admin123` (atau `demo`)
+  - Halaman tujuan: `dashboard.html`
+- **Mode Pelanggan (User Tracking)**:
+  - Email/Username: `budi@gmail.com` (atau `budi`)
+  - Password: `budi123`
+  - Halaman tujuan: `dashboard-user.html`

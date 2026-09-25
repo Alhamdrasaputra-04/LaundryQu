@@ -686,7 +686,7 @@ const LaundryAuth = {
         }
 
         // 4. Cek Akun Default Bawaan jika baru pertama kali dijalankan
-        if (identifier === 'admin@laundryku.com') {
+        if (identifier === 'admin@laundryku.com' || identifier === 'admin') {
             if (password === 'admin123') {
                 const adminUser = { nama: 'Admin LaundryKu', email: 'admin@laundryku.com', role: 'admin', isLoggedIn: true };
                 localStorage.setItem('laundryUser', JSON.stringify(adminUser));
@@ -695,7 +695,7 @@ const LaundryAuth = {
                 return { success: false, message: 'Kata sandi salah! Silakan periksa kembali password Anda.' };
             }
         }
-        if (identifier === 'budi@gmail.com') {
+        if (identifier === 'budi@gmail.com' || identifier === 'budi') {
             if (password === 'budi123') {
                 const budiUser = { nama: 'Budi Santoso', email: 'budi@gmail.com', role: 'user', isLoggedIn: true };
                 localStorage.setItem('laundryUser', JSON.stringify(budiUser));
@@ -800,9 +800,13 @@ const LaundryAuth = {
             return null;
         }
         if (allowedRoles && Array.isArray(allowedRoles) && !allowedRoles.includes(user.role)) {
-            alert('Akses Terbatas: Halaman ini hanya untuk hak akses ' + allowedRoles.join('/') + '.');
-            window.location.href = 'dashboard.html';
-            return null;
+            if (user.role === 'user') {
+                window.location.href = 'dashboard-user.html';
+                return null;
+            } else {
+                window.location.href = 'dashboard.html';
+                return null;
+            }
         }
         return user;
     }

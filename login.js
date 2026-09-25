@@ -60,7 +60,11 @@ loginForm.addEventListener('submit', async function(e) {
 
         showMessage(`Login berhasil! Selamat datang, ${res.user.nama || 'Pengguna'}.`, 'success');
         setTimeout(function() { 
-            window.location.href = 'dashboard.html'; 
+            if (res.user && res.user.role === 'admin') {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'dashboard-user.html';
+            }
         }, 1200);
 
     } catch (err) {
@@ -122,7 +126,11 @@ googleBtn.addEventListener('click', async function() {
         localStorage.setItem('laundryUser', JSON.stringify(googleUser));
         showMessage('Login Google berhasil! Mengalihkan ke Dashboard...', 'success');
         setTimeout(function() {
-            window.location.href = 'dashboard.html';
+            if (googleUser.role === 'admin') {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'dashboard-user.html';
+            }
         }, 1200);
     }, 1200);
 });
@@ -197,9 +205,15 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('LaundryApp Login Loaded');
     const storedUser = localStorage.getItem('laundryUser');
     if (storedUser) {
-        const user = JSON.parse(storedUser);
-        if (user.isLoggedIn) {
-            window.location.href = 'dashboard.html';
-        }
+        try {
+            const user = JSON.parse(storedUser);
+            if (user && user.isLoggedIn) {
+                if (user.role === 'admin') {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'dashboard-user.html';
+                }
+            }
+        } catch(e){}
     }
 });

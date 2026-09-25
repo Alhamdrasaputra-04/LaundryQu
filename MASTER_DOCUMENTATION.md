@@ -51,7 +51,7 @@
 3. **Akun Pengujian Demo (Cepat):**
    - **Mode Admin (Pengelola):** Email/Username: `admin` (atau `demo`), Password: `admin123` (atau `demo`)  
      ➔ Diarahkan ke [dashboard.html](file:///d:/KULIAH/Login/dashboard.html)
-   - **Mode User (Pelanggan):** Email/Username: `user`, Password: `user123` (atau `demo`)  
+   - **Mode User (Pelanggan):** Email/Username: `budi@gmail.com` (atau `budi`), Password: `budi123`  
      ➔ Diarahkan ke [dashboard-user.html](file:///d:/KULIAH/Login/dashboard-user.html)
 
 ---
