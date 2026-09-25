@@ -25,6 +25,12 @@ if (typeof window !== 'undefined' && window.supabase && window.supabase.createCl
 const LaundryDB = {
     // 1. Ambil Semua Transaksi
     async getTransactions() {
+        let localList = [];
+        try {
+            const local = localStorage.getItem('laundry_transactions');
+            if (local) localList = JSON.parse(local);
+        } catch(e){}
+
         if (sbClient) {
             try {
                 const { data, error } = await sbClient
@@ -34,56 +40,84 @@ const LaundryDB = {
 
                 if (!error && data && data.length > 0) {
                     // Normalisasi kolom
-                    return data.map(item => ({
-                        id: item.kode_transaksi || ('TRX00' + item.id),
-                        dbId: item.id,
-                        pelanggan: item.pelanggan_nama,
-                        telepon: item.nomor_telepon || '-',
-                        layanan: item.layanan_nama,
-                        berat: parseFloat(item.berat) || 1,
-                        total: parseFloat(item.total) || 0,
-                        statusCucian: item.status_cucian,
-                        pembayaran: item.status_pembayaran,
-                        tanggal: item.tanggal_masuk,
-                        estimasi: item.estimasi_selesai,
-                        catatan: item.catatan || '-'
-                    }));
+                    return data.map(item => {
+                        const localItem = localList.find(l => l.id === (item.kode_transaksi || ('TRX00' + item.id))) || {};
+                        return {
+                            id: item.kode_transaksi || ('TRX00' + item.id),
+                            dbId: item.id,
+                            pelangganId: item.pelanggan_id,
+                            pelanggan: item.pelanggan_nama,
+                            telepon: item.nomor_telepon || '-',
+                            layananId: item.layanan_id,
+                            layanan: item.layanan_nama,
+                            berat: parseFloat(item.berat) || 1,
+                            total: parseFloat(item.total) || 0,
+                            statusCucian: item.status_cucian,
+                            pembayaran: item.status_pembayaran,
+                            tanggal: item.tanggal_masuk,
+                            estimasi: item.estimasi_selesai,
+                            catatan: item.catatan || '-',
+                            metodeBayar: localItem.metodeBayar || (item.status_pembayaran === 'Lunas' ? 'Tunai' : '-'),
+                            nominalDP: localItem.nominalDP || 0,
+                            cashReceived: localItem.cashReceived || 0,
+                            kembalian: localItem.kembalian || 0
+                        };
+                    });
                 }
             } catch (err) {
                 console.warn('Supabase fetch error, using local fallback:', err.message);
             }
         }
         // Fallback: Ambil dari localStorage
-        const local = localStorage.getItem('laundry_transactions');
-        if (local) {
-            try { return JSON.parse(local); } catch(e){}
+        if (localList && localList.length > 0) {
+            return localList;
         }
         return null; // Gunakan default awal
     },
 
     // 2. Simpan Transaksi Baru
     async addTransaction(trx) {
+        let currentUser = null;
+        try {
+            if (typeof LaundryAuth !== 'undefined' && LaundryAuth.getCurrentUser) {
+                currentUser = LaundryAuth.getCurrentUser();
+            }
+        } catch(e){}
+
         // Simpan ke Supabase jika aktif
         if (sbClient) {
             try {
+                const insertPayload = {
+                    kode_transaksi: trx.id,
+                    pelanggan_nama: trx.pelanggan,
+                    nomor_telepon: trx.telepon || '-',
+                    layanan_nama: trx.layanan,
+                    berat: trx.berat || 1,
+                    total: trx.total,
+                    status_cucian: trx.statusCucian || 'Baru Masuk',
+                    status_pembayaran: trx.pembayaran || 'Belum',
+                    tanggal_masuk: trx.tanggal || new Date().toISOString().split('T')[0],
+                    estimasi_selesai: trx.estimasi || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+                    catatan: trx.catatan || ''
+                };
+
+                if (trx.pelangganId && !isNaN(Number(trx.pelangganId))) {
+                    insertPayload.pelanggan_id = Number(trx.pelangganId);
+                }
+                if (trx.layananId && !isNaN(Number(trx.layananId))) {
+                    insertPayload.layanan_id = Number(trx.layananId);
+                }
+                if (currentUser && currentUser.id) {
+                    insertPayload.user_id = currentUser.id;
+                }
+
                 const { data, error } = await sbClient
                     .from('transaksi')
-                    .insert([{
-                        kode_transaksi: trx.id,
-                        pelanggan_nama: trx.pelanggan,
-                        nomor_telepon: trx.telepon || '-',
-                        layanan_nama: trx.layanan,
-                        berat: trx.berat || 1,
-                        total: trx.total,
-                        status_cucian: trx.statusCucian || 'Baru Masuk',
-                        status_pembayaran: trx.pembayaran || 'Belum',
-                        tanggal_masuk: trx.tanggal || new Date().toISOString().split('T')[0],
-                        estimasi_selesai: trx.estimasi || new Date(Date.now() + 86400000).toISOString().split('T')[0],
-                        catatan: trx.catatan || ''
-                    }])
+                    .insert([insertPayload])
                     .select();
 
                 if (!error && data && data[0]) {
+                    trx.dbId = data[0].id;
                     // Tambah riwayat awal
                     await sbClient.from('riwayat_status').insert([{
                         transaksi_id: data[0].id,
@@ -101,7 +135,7 @@ const LaundryDB = {
     },
 
     // 3. Update Status Transaksi
-    async updateStatus(id, newStatus, newPayment, catatan = '') {
+    async updateStatus(id, newStatus, newPayment, catatan = '', extraMeta = {}) {
         if (sbClient) {
             try {
                 const updatePayload = {};
@@ -126,7 +160,7 @@ const LaundryDB = {
                 console.warn('Supabase update warning:', err.message);
             }
         }
-        LaundryDB.syncLocal({ id, statusCucian: newStatus, pembayaran: newPayment }, 'update');
+        LaundryDB.syncLocal({ id, statusCucian: newStatus, pembayaran: newPayment, ...extraMeta }, 'update');
     },
 
     // 4. Hapus Transaksi
@@ -157,11 +191,99 @@ const LaundryDB = {
                 if (item.statusCucian) list[idx].statusCucian = item.statusCucian;
                 if (item.pembayaran) list[idx].pembayaran = item.pembayaran;
                 if (item.catatan) list[idx].catatan = item.catatan;
+                if (item.metodeBayar) list[idx].metodeBayar = item.metodeBayar;
+                if (typeof item.nominalDP !== 'undefined') list[idx].nominalDP = item.nominalDP;
+                if (typeof item.cashReceived !== 'undefined') list[idx].cashReceived = item.cashReceived;
+                if (typeof item.kembalian !== 'undefined') list[idx].kembalian = item.kembalian;
             }
         } else if (action === 'delete') {
             list = list.filter(t => t.id !== item.id);
         }
         localStorage.setItem('laundry_transactions', JSON.stringify(list));
+    },
+
+    // 4.1 Ambil Riwayat Status Real dari Supabase
+    async getTransactionHistory(trxId, dbId) {
+        if (sbClient && dbId) {
+            try {
+                const { data, error } = await sbClient
+                    .from('riwayat_status')
+                    .select('*')
+                    .eq('transaksi_id', dbId)
+                    .order('waktu', { ascending: true });
+                if (!error && data && data.length > 0) {
+                    return data;
+                }
+            } catch(e){
+                console.warn('Supabase fetch riwayat error:', e.message);
+            }
+        }
+        return null;
+    },
+
+    // 4.2 Ambil Pengaturan Profil Outlet (Supabase + Local)
+    async getOutletSettings() {
+        if (sbClient) {
+            try {
+                const { data, error } = await sbClient
+                    .from('pengaturan_outlet')
+                    .select('*')
+                    .eq('id', 1)
+                    .maybeSingle();
+
+                if (!error && data) {
+                    const mapped = {
+                        nama: data.nama_outlet || 'LaundryKu',
+                        slogan: data.slogan || 'Bersih, Wangi & Terpercaya',
+                        wa: data.nomor_wa || '081234567890',
+                        jam: data.jam_operasional || '07:00 - 21:00 WIB',
+                        alamat: data.alamat || 'Jl. Kampus No. 12, Limau Manis, Padang',
+                        footer: data.footer_nota || 'Terima kasih atas kepercayaannya! Cucian Anda aman bersama kami.'
+                    };
+                    localStorage.setItem('laundry_outlet_profile', JSON.stringify(mapped));
+                    return mapped;
+                }
+            } catch(e) {
+                console.warn('Supabase fetch outlet settings warning:', e.message);
+            }
+        }
+        const local = localStorage.getItem('laundry_outlet_profile');
+        if (local) {
+            try { return JSON.parse(local); } catch(e){}
+        }
+        return {
+            nama: 'LaundryKu',
+            slogan: 'Bersih, Wangi & Terpercaya',
+            wa: '081234567890',
+            jam: '07:00 - 21:00 WIB',
+            alamat: 'Jl. Kampus No. 12, Limau Manis, Padang',
+            footer: 'Terima kasih atas kepercayaannya! Cucian Anda aman bersama kami.'
+        };
+    },
+
+    // 4.3 Simpan Pengaturan Profil Outlet (Supabase + Local)
+    async updateOutletSettings(payload) {
+        if (sbClient) {
+            try {
+                await sbClient
+                    .from('pengaturan_outlet')
+                    .upsert({
+                        id: 1,
+                        nama_outlet: payload.nama,
+                        slogan: payload.slogan,
+                        nomor_wa: payload.wa,
+                        jam_operasional: payload.jam,
+                        alamat: payload.alamat,
+                        footer_nota: payload.footer,
+                        updated_at: new Date().toISOString()
+                    });
+                console.log('✅ Pengaturan outlet berhasil disimpan ke Supabase.');
+            } catch(e) {
+                console.warn('Supabase update outlet settings warning:', e.message);
+            }
+        }
+        localStorage.setItem('laundry_outlet_profile', JSON.stringify(payload));
+        return payload;
     },
 
     // 5. Ambil Data Pelanggan
@@ -667,6 +789,22 @@ const LaundryAuth = {
                 localStorage.setItem('laundry_registered_users', JSON.stringify(regUsers));
             }
         } catch(e){}
+    },
+
+    // 5. Auth Guard & Role Verification
+    requireAuth(allowedRoles = null) {
+        const user = LaundryAuth.getCurrentUser();
+        if (!user || !user.isLoggedIn) {
+            console.warn('⚠️ Sesi login tidak ditemukan. Mengalihkan ke Login.html');
+            window.location.href = 'Login.html';
+            return null;
+        }
+        if (allowedRoles && Array.isArray(allowedRoles) && !allowedRoles.includes(user.role)) {
+            alert('Akses Terbatas: Halaman ini hanya untuk hak akses ' + allowedRoles.join('/') + '.');
+            window.location.href = 'dashboard.html';
+            return null;
+        }
+        return user;
     }
 };
 

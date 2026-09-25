@@ -97,16 +97,28 @@ googleBtn.addEventListener('click', async function() {
         console.warn('Supabase Google OAuth belum aktif di Cloud Console:', err.message);
     }
 
-    // Fallback: Login Single Sign-On (SSO) Google yang langsung terhubung ke Dashboard
+    // Fallback: Login Single Sign-On (SSO) Google yang disinkronkan ke Database
     showMessage('Menghubungkan akun Google Anda...', 'info');
-    setTimeout(function() {
+    setTimeout(async function() {
         const googleUser = {
-            nama: 'Pengguna Google',
+            nama: 'Pengguna Google (Demo)',
             email: 'user.google@gmail.com',
-            role: 'user',
+            role: 'admin',
             provider: 'google',
             isLoggedIn: true
         };
+
+        if (window.sbClient) {
+            try {
+                await window.sbClient.from('profiles').upsert([{
+                    nama: googleUser.nama,
+                    email: googleUser.email,
+                    role: googleUser.role,
+                    password: 'google_sso_demo'
+                }], { onConflict: 'email' });
+            } catch(e){}
+        }
+
         localStorage.setItem('laundryUser', JSON.stringify(googleUser));
         showMessage('Login Google berhasil! Mengalihkan ke Dashboard...', 'success');
         setTimeout(function() {
@@ -114,6 +126,15 @@ googleBtn.addEventListener('click', async function() {
         }, 1200);
     }, 1200);
 });
+
+// Lupa Password Handler
+const forgotLink = document.querySelector('.forgot-password');
+if (forgotLink) {
+    forgotLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        showMessage('Untuk reset kata sandi, hubungi Admin LaundryKu atau masuk menggunakan akun cepat (demo/demo).', 'info');
+    });
+}
 
 // ============================================
 // 5. Signup Link Handler

@@ -64,8 +64,10 @@ create table if not exists public.transaksi (
     updated_at timestamp with time zone default now()
 );
 
--- Pastikan kolom user_id ada jika tabel sudah terlanjur dibuat sebelumnya
+-- Pastikan kolom user_id dan metode pembayaran ada jika tabel sudah dibuat
 alter table public.transaksi add column if not exists user_id uuid references public.profiles(id);
+alter table public.transaksi add column if not exists metode_pembayaran text default 'Tunai';
+alter table public.transaksi add column if not exists nominal_dp numeric default 0;
 
 -- 6. TABEL RIWAYAT STATUS (HISTORI TIMELINE TRACKING)
 create table if not exists public.riwayat_status (

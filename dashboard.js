@@ -94,6 +94,9 @@ let currentEditingId = null;
 // DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.LaundryAuth && LaundryAuth.requireAuth) {
+        if (!LaundryAuth.requireAuth()) return;
+    }
     initDate();
     initUserProfile();
     renderRevenueChart(getDynamicRevenueData(currentPeriod));

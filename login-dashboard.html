@@ -64,7 +64,10 @@
 
     <script>
         function navigate(page) {
-            alert('Navigating to: ' + page);
+            if (page === 'new-order') window.location.href = 'transaksi.html';
+            else if (page === 'my-orders' || page === 'status') window.location.href = 'cucian.html';
+            else if (page === 'profile') window.location.href = 'pengaturan.html';
+            else window.location.href = 'dashboard.html';
         }
         
         function logout() {

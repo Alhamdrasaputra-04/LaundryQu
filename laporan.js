@@ -26,6 +26,9 @@ const BAYAR_BADGE = {
 // DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.LaundryAuth && LaundryAuth.requireAuth) {
+        if (!LaundryAuth.requireAuth(['admin'])) return;
+    }
     initDate();
     initUserProfile();
     initSidebar();

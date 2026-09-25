@@ -25,6 +25,9 @@ let currentDetailTrx = null;
 // DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.LaundryAuth && LaundryAuth.requireAuth) {
+        if (!LaundryAuth.requireAuth()) return;
+    }
     initDate();
     initUserProfile();
     initSidebar();
@@ -287,7 +290,7 @@ function applyViewPreset(view) {
 // ============================================================
 // DETAIL MODAL & TIMELINE
 // ============================================================
-function viewDetailKanban(id) {
+async function viewDetailKanban(id) {
     const trx = allTransactions.find(t => t.id === id);
     if (!trx) return;
     currentDetailTrx = trx;
@@ -298,6 +301,13 @@ function viewDetailKanban(id) {
     if (!overlay || !bodyEl) return;
 
     codeEl.textContent = '#' + trx.id;
+
+    let realHistory = [];
+    try {
+        if (window.LaundryDB && LaundryDB.getTransactionHistory) {
+            realHistory = await LaundryDB.getTransactionHistory(trx.id, trx.dbId) || [];
+        }
+    } catch(e){}
 
     const stagesList = [
         { key: 'Baru Masuk',   label: 'Pesanan Diterima (Baru Masuk)' },
@@ -330,12 +340,20 @@ function viewDetailKanban(id) {
             </div>
         </div>
 
-        <h3 style="font-size:14px; font-weight:700; margin-bottom:14px; color:#1E293B;">Alur Pengerjaan 6-Tahap</h3>
+        <h3 style="font-size:14px; font-weight:700; margin-bottom:14px; color:#1E293B;">Alur Pengerjaan & Riwayat Tracking</h3>
         <div class="timeline" style="margin-left:8px;">
             ${stagesList.map((s, idx) => {
                 let statusClass = 'pending';
                 if (idx < currentStageIdx) statusClass = 'completed';
                 else if (idx === currentStageIdx) statusClass = 'active';
+
+                const matchedLog = realHistory.find(h => h.status === s.key);
+                let timeDesc = statusClass === 'active' ? 'Tahap pengerjaan saat ini' : (statusClass === 'completed' ? 'Selesai dilewati' : 'Menunggu antrean');
+                if (matchedLog && matchedLog.waktu) {
+                    const d = new Date(matchedLog.waktu);
+                    const formatted = !isNaN(d) ? d.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '';
+                    timeDesc = `✓ Dicatat pada ${formatted} WIB: ${matchedLog.catatan || s.label}`;
+                }
 
                 return `
                     <div class="timeline-step ${statusClass}">
@@ -344,7 +362,7 @@ function viewDetailKanban(id) {
                         </div>
                         <div class="step-content">
                             <div class="step-title">${s.label}</div>
-                            <div class="step-desc">${statusClass === 'active' ? 'Tahap pengerjaan saat ini' : (statusClass === 'completed' ? 'Selesai dilewati' : 'Menunggu antrean')}</div>
+                            <div class="step-desc" style="font-size:11.5px; color:${matchedLog ? '#059669' : ''};">${timeDesc}</div>
                         </div>
                     </div>
                 `;

@@ -27,6 +27,9 @@ const BAYAR_BADGE = {
 // DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.LaundryAuth && LaundryAuth.requireAuth) {
+        if (!LaundryAuth.requireAuth()) return;
+    }
     initDate();
     initUserProfile();
     initSidebar();
@@ -544,7 +547,18 @@ async function saveSettlement(shouldPrintReceipt) {
     const statusNote = `Kasir pelunasan via ${currentSettleMethod} (${finalPaymentStatus}). ${notes}`;
 
     if (window.LaundryDB) {
-        await LaundryDB.updateStatus(currentSettleTrx.id, null, finalPaymentStatus, statusNote);
+        await LaundryDB.updateStatus(
+            currentSettleTrx.id, 
+            null, 
+            finalPaymentStatus, 
+            statusNote,
+            {
+                metodeBayar: currentSettleMethod,
+                nominalDP: dpVal,
+                cashReceived: cashReceived,
+                kembalian: changeVal
+            }
+        );
     }
 
     // Update in memory
@@ -587,15 +601,29 @@ async function saveSettlement(shouldPrintReceipt) {
 window.saveSettlement = saveSettlement;
 
 // ============================================================
-// PRINTABLE RECEIPT MODAL
+// PRINTABLE RECEIPT MODAL (DYNAMIC OUTLET INFO)
 // ============================================================
-function openReceipt(id) {
+async function openReceipt(id) {
     const trx = allTransactions.find(t => t.id === id);
     if (!trx) return;
 
     const overlay = document.getElementById('receiptModalOverlay');
     const box = document.getElementById('printableReceiptBox');
     if (!overlay || !box) return;
+
+    let outlet = {
+        nama: 'LAUNDRYKU',
+        slogan: 'Sistem Manajemen Laundry Modern & Higienis',
+        alamat: 'Jl. Kampus No. 12, Padang',
+        wa: '0812-3456-7890',
+        footer: 'Terima kasih atas kunjungan & kepercayaan Anda!'
+    };
+
+    try {
+        if (window.LaundryDB && LaundryDB.getOutletSettings) {
+            outlet = await LaundryDB.getOutletSettings();
+        }
+    } catch(e){}
 
     const totalVal = Number(trx.total) || 0;
     const nowStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
@@ -634,10 +662,10 @@ function openReceipt(id) {
 
     box.innerHTML = `
         <div class="receipt-header">
-            <div class="receipt-logo">LAUNDRYKU</div>
-            <div style="font-size:11px; color:#64748B; margin-top:2px;">Sistem Manajemen Laundry Modern & Higienis</div>
-            <div style="font-size:11.5px; margin-top:4px;">Jl. Kampus No. 12, Padang</div>
-            <div style="font-size:11.5px;">WA: 0812-3456-7890</div>
+            <div class="receipt-logo">${(outlet.nama || 'LAUNDRYKU').toUpperCase()}</div>
+            <div style="font-size:11px; color:#64748B; margin-top:2px;">${outlet.slogan || 'Sistem Manajemen Laundry Modern & Higienis'}</div>
+            <div style="font-size:11.5px; margin-top:4px;">${outlet.alamat || 'Jl. Kampus No. 12, Padang'}</div>
+            <div style="font-size:11.5px;">WA: ${outlet.wa || '0812-3456-7890'}</div>
         </div>
         <div class="receipt-line">
             <span>No. Nota:</span>
@@ -677,8 +705,8 @@ function openReceipt(id) {
             </b>
         </div>
         <div class="receipt-footer">
-            <div>Terima kasih atas kunjungan & kepercayaan Anda!</div>
-            <div style="margin-top:4px; font-weight:600;">Pakaian Bersih, Wangi & Rapi Bersama LaundryKu</div>
+            <div>${outlet.footer || 'Terima kasih atas kunjungan & kepercayaan Anda!'}</div>
+            <div style="margin-top:4px; font-weight:600;">Pakaian Bersih, Wangi & Rapi Bersama ${(outlet.nama || 'LaundryKu')}</div>
         </div>
     `;
 

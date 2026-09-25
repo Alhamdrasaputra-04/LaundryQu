@@ -37,6 +37,9 @@ const TIMELINE_STAGES = [
 // DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.LaundryAuth && LaundryAuth.requireAuth) {
+        if (!LaundryAuth.requireAuth()) return;
+    }
     initDate();
     initUserProfile();
     initSidebar();
@@ -143,7 +146,7 @@ function populateAddTrxDropdowns() {
         } else {
             custSelect.innerHTML = `<option value="">-- Pilih Pelanggan --</option>` + 
                 allCustomers.map(c => `
-                    <option value="${c.nama}" data-telp="${c.telepon}">${c.nama} (${c.telepon})</option>
+                    <option value="${c.nama}" data-id="${c.id}" data-telp="${c.telepon}">${c.nama} (${c.telepon})</option>
                 `).join('');
         }
     }
@@ -151,10 +154,17 @@ function populateAddTrxDropdowns() {
     // Dropdown Layanan
     const srvSelect = document.getElementById('trxLayananSelect');
     if (srvSelect) {
-        srvSelect.innerHTML = `<option value="">-- Pilih Layanan --</option>` +
-            allServices.map(s => `
-                <option value="${s.harga}">${s.nama_layanan} (Rp ${Number(s.harga).toLocaleString('id-ID')}/${s.satuan || 'kg'})</option>
-            `).join('');
+        if (allServices.length === 0) {
+            srvSelect.innerHTML = `<option value="">-- Belum ada master layanan --</option>`;
+        } else {
+            srvSelect.innerHTML = `<option value="">-- Pilih Layanan --</option>` +
+                allServices.map(s => {
+                    const harga = Number(s.tarif || s.harga || 0);
+                    const nama = s.nama || s.nama_layanan || 'Layanan';
+                    const satuan = s.satuan || 'kg';
+                    return `<option value="${harga}" data-id="${s.id}" data-name="${nama}" data-satuan="${satuan}">${nama} (Rp ${harga.toLocaleString('id-ID')}/${satuan})</option>`;
+                }).join('');
+        }
     }
 }
 
@@ -439,23 +449,31 @@ function initModals() {
         const catIn   = document.getElementById('trxCatatanInput');
 
         const pelanggan = custSel.value;
-        const harga = parseInt(srvSel.value);
-        const berat = parseInt(beratIn.value);
+        const harga = parseInt(srvSel.value, 10);
+        const berat = parseFloat(beratIn.value) || 0;
 
         if (!pelanggan) { showToast('Pilih nama pelanggan terlebih dahulu', 'error'); return; }
-        if (!harga) { showToast('Pilih jenis layanan laundry', 'error'); return; }
-        if (!berat || berat < 1) { showToast('Masukkan berat/jumlah cucian yang valid', 'error'); return; }
+        if (!harga || isNaN(harga)) { showToast('Pilih jenis layanan laundry yang valid', 'error'); return; }
+        if (!berat || berat < 0.5) { showToast('Masukkan berat/jumlah cucian minimal 0.5 kg/pcs', 'error'); return; }
 
-        const srvText = srvSel.options[srvSel.selectedIndex].text.split(' (')[0];
+        const selectedSrvOpt = srvSel.options[srvSel.selectedIndex];
+        const srvText = selectedSrvOpt ? (selectedSrvOpt.dataset.name || selectedSrvOpt.text.split(' (')[0]) : 'Cuci Reguler';
+        const srvId = selectedSrvOpt ? selectedSrvOpt.dataset.id : null;
+
         const selectedCustOpt = custSel.options[custSel.selectedIndex];
-        const telepon = selectedCustOpt.dataset.telp || '0812-3456-7890';
-        const total = harga * berat;
-        const newId = 'TRX00' + (132 + allTransactions.length);
+        const telepon = selectedCustOpt ? (selectedCustOpt.dataset.telp || '-') : '-';
+        const custId = selectedCustOpt ? selectedCustOpt.dataset.id : null;
+
+        const total = Math.round(harga * berat);
+        const randomNum = Math.floor(Math.random() * 899 + 100);
+        const newId = 'TRX00' + (allTransactions.length + 130 + randomNum % 50);
 
         const newTrx = {
             id: newId,
+            pelangganId: custId,
             pelanggan,
             telepon,
+            layananId: srvId,
             layanan: srvText,
             berat,
             total,
@@ -467,20 +485,27 @@ function initModals() {
         };
 
         saveAddBtn.disabled = true;
+        saveAddBtn.textContent = 'Menyimpan...';
 
-        if (window.LaundryDB) {
-            await LaundryDB.addTransaction(newTrx);
+        try {
+            if (window.LaundryDB) {
+                await LaundryDB.addTransaction(newTrx);
+            }
+
+            allTransactions.unshift(newTrx);
+            filteredTransactions.unshift(newTrx);
+
+            renderTransactions(filteredTransactions);
+            updateTrxMetrics();
+            updateLiveNotifications();
+            closeAddModal();
+            showToast(`Transaksi #${newId} berhasil disimpan ke database!`, 'success');
+        } catch(err) {
+            showToast('Gagal menyimpan transaksi: ' + err.message, 'error');
+        } finally {
+            saveAddBtn.disabled = false;
+            saveAddBtn.textContent = 'Simpan Transaksi';
         }
-
-        allTransactions.unshift(newTrx);
-        filteredTransactions.unshift(newTrx);
-
-        saveAddBtn.disabled = false;
-        renderTransactions(filteredTransactions);
-        updateTrxMetrics();
-        updateLiveNotifications();
-        closeAddModal();
-        showToast(`Transaksi #${newId} berhasil disimpan ke database!`, 'success');
     });
 
     // 2. Detail Modal

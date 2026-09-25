@@ -17,6 +17,9 @@ let servicesList = [];
 // DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.LaundryAuth && LaundryAuth.requireAuth) {
+        if (!LaundryAuth.requireAuth(['admin'])) return;
+    }
     initDate();
     initUserProfile();
     initSidebar();
@@ -78,34 +81,57 @@ function initTabs() {
 }
 
 // ============================================================
-// TAB 1: OUTLET PROFILE
+// TAB 1: OUTLET PROFILE (SUPABASE CLOUD SYNC)
 // ============================================================
-function initOutletProfile() {
-    const stored = localStorage.getItem('laundry_outlet_profile');
-    if (stored) {
-        try {
-            const data = JSON.parse(stored);
+async function initOutletProfile() {
+    try {
+        let data = null;
+        if (window.LaundryDB && LaundryDB.getOutletSettings) {
+            data = await LaundryDB.getOutletSettings();
+        } else {
+            const stored = localStorage.getItem('laundry_outlet_profile');
+            if (stored) data = JSON.parse(stored);
+        }
+
+        if (data) {
             if (data.nama) document.getElementById('outletNama').value = data.nama;
             if (data.slogan) document.getElementById('outletSlogan').value = data.slogan;
             if (data.wa) document.getElementById('outletWA').value = data.wa;
             if (data.jam) document.getElementById('outletJam').value = data.jam;
             if (data.alamat) document.getElementById('outletAlamat').value = data.alamat;
             if (data.footer) document.getElementById('outletFooter').value = data.footer;
-        } catch (e) {}
+        }
+    } catch (e) {
+        console.warn('Gagal memuat profil outlet:', e);
     }
 
     const saveBtn = document.getElementById('btnSaveOutlet');
-    saveBtn && saveBtn.addEventListener('click', () => {
+    saveBtn && saveBtn.addEventListener('click', async () => {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Menyimpan...';
+
         const payload = {
-            nama: document.getElementById('outletNama').value.trim(),
-            slogan: document.getElementById('outletSlogan').value.trim(),
-            wa: document.getElementById('outletWA').value.trim(),
-            jam: document.getElementById('outletJam').value.trim(),
-            alamat: document.getElementById('outletAlamat').value.trim(),
-            footer: document.getElementById('outletFooter').value.trim()
+            nama: document.getElementById('outletNama').value.trim() || 'LaundryKu',
+            slogan: document.getElementById('outletSlogan').value.trim() || 'Bersih, Wangi & Terpercaya',
+            wa: document.getElementById('outletWA').value.trim() || '081234567890',
+            jam: document.getElementById('outletJam').value.trim() || '07:00 - 21:00 WIB',
+            alamat: document.getElementById('outletAlamat').value.trim() || 'Jl. Kampus No. 12, Padang',
+            footer: document.getElementById('outletFooter').value.trim() || 'Terima kasih atas kepercayaannya!'
         };
-        localStorage.setItem('laundry_outlet_profile', JSON.stringify(payload));
-        showToast('Profil outlet berhasil disimpan!', 'success');
+
+        try {
+            if (window.LaundryDB && LaundryDB.updateOutletSettings) {
+                await LaundryDB.updateOutletSettings(payload);
+            } else {
+                localStorage.setItem('laundry_outlet_profile', JSON.stringify(payload));
+            }
+            showToast('Profil outlet berhasil disimpan ke database cloud!', 'success');
+        } catch(err) {
+            showToast('Gagal menyimpan profil outlet: ' + err.message, 'error');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Simpan Profil Outlet';
+        }
     });
 }
 
