@@ -49,7 +49,7 @@
                     <div class="input-group">
                         <div class="label-with-link">
                             <label for="password">Password</label>
-                            <a href="#" class="forgot-password">Lupa password?</a>
+                            <a href="lupa-password.html" class="forgot-password" id="forgotPasswordLink">Lupa password?</a>
                         </div>
                         <div class="input-wrapper">
                             <span class="input-icon">
@@ -170,6 +170,110 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- ================= MODAL LUPA / RESET PASSWORD ================= -->
+    <div class="modal-overlay" id="forgotModalOverlay" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-labelledby="modalTitle">
+            <div class="modal-header">
+                <div class="modal-badge">
+                    <svg viewBox="0 0 24 24" class="modal-svg-icon">
+                        <path d="M12.65,10C11.83,7.67 9.61,6 7,6A6,6 0 0,0 1,12A6,6 0 0,0 7,18C9.61,18 11.83,16.33 12.65,14H17V18H21V14H23V10H12.65M7,14A2,2 0 0,1 5,12A2,2 0 0,1 7,10A2,2 0 0,1 9,12A2,2 0 0,1 7,14Z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="modal-title" id="modalTitle">Reset Kata Sandi</h2>
+                    <p class="modal-subtitle">Pulihkan akses akun LaundryKu Anda dengan aman.</p>
+                </div>
+                <button type="button" class="modal-close-btn" id="closeForgotModal" aria-label="Tutup modal">&times;</button>
+            </div>
+
+            <!-- Modal Alert Banner -->
+            <div class="modal-alert" id="modalAlert"></div>
+
+            <!-- Step 1: Cari Akun berdasarkan Email / Username -->
+            <div class="modal-step" id="stepFindAccount">
+                <div class="input-group">
+                    <label for="resetEmail">Email Akun Terdaftar</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4M20,8L12,13L4,8V6L12,11L20,6V8Z" />
+                            </svg>
+                        </span>
+                        <input type="email" id="resetEmail" placeholder="nama@email.com (atau demo)" autocomplete="email">
+                    </div>
+                    <span class="input-hint">Masukkan alamat email yang Anda gunakan saat mendaftar.</span>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" id="cancelForgotModal">Batal</button>
+                    <button type="button" class="btn-modal-primary" id="btnVerifyAccount">
+                        <span class="btn-text">Verifikasi Akun</span>
+                        <div class="btn-spinner"></div>
+                        <svg class="btn-arrow" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;">
+                            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Atur Kata Sandi Baru -->
+            <div class="modal-step" id="stepNewPassword" style="display: none;">
+                <div class="user-verified-badge" id="verifiedBadge">
+                    <div class="verify-icon">✓</div>
+                    <div class="verify-details">
+                        <span class="verify-name" id="verifiedUserName">Nama Akun</span>
+                        <span class="verify-email" id="verifiedUserEmail">email@domain.com</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="newPasswordInput">Kata Sandi Baru (Min. 6 Karakter)</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
+                            </svg>
+                        </span>
+                        <input type="password" id="newPasswordInput" placeholder="••••••••" autocomplete="new-password">
+                        <button type="button" class="toggle-password" id="toggleNewPassBtn" aria-label="Lihat kata sandi">
+                            <svg class="eye-icon" viewBox="0 0 24 24">
+                                <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirmPasswordInput">Ulangi Kata Sandi Baru</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
+                            </svg>
+                        </span>
+                        <input type="password" id="confirmPasswordInput" placeholder="••••••••" autocomplete="new-password">
+                        <button type="button" class="toggle-password" id="toggleConfirmPassBtn" aria-label="Lihat kata sandi">
+                            <svg class="eye-icon" viewBox="0 0 24 24">
+                                <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" id="btnBackStep">Kembali</button>
+                    <button type="button" class="btn-modal-primary" id="btnSaveNewPassword">
+                        <span class="btn-text">Simpan Sandi Baru</span>
+                        <div class="btn-spinner"></div>
+                        <svg class="btn-arrow" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;">
+                            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Message Toast Container for login.js -->

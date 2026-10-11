@@ -1,0 +1,85 @@
+================================================================================
+                    TUGAS LATIHAN MANDIRI METODOLOGI PENELITIAN
+================================================================================
+Nama Mahasiswa : Alhamdrasaputra
+Topik / Judul  : Rancang Bangun Sistem Informasi Manajemen Operasional, Kasir POS
+                 (Point of Sale), dan Pelacakan Status Cucian Terintegrasi Cloud 
+                 Berbasis Web dan Mobile (Flutter) pada UMKM Laundry (LaundryKu)
+================================================================================
+
+1. MASALAH UTAMA DALAM SATU KALIMAT & SUMBER TEMUANNYA:
+--------------------------------------------------------------------------------
+- Pernyataan Masalah:
+  "Pencatatan transaksi yang masih konvensional dan ketiadaan sistem monitoring
+   alur pengerjaan cucian terintegrasi pada UMKM laundry menyebabkan tingginya
+   risiko salah hitung keuangan kasir, potensi pakaian tertukar/hilang, serta
+   rendahnya transparansi estimasi waktu selesai bagi pelanggan."
+
+- Sumber Temuan:
+  a. Data Lapangan (Observasi & Wawancara UMKM Laundry):
+     Proses pencatatan masih mengandalkan nota kertas fisik yang rentan rusak/hilang,
+     penghitungan uang muka (DP) dan sisa piutang sering tidak sinkron saat kasir
+     tutup buku harian, serta kasir sering terganggu melayani pertanyaan pelanggan
+     yang bolak-balik menanyakan apakah pakaiannya sudah selesai dicuci atau belum.
+  b. Literatur / Artikel Ilmiah:
+     Berdasarkan kajian pustaka digitalisasi operasional UMKM jasa, sistem 
+     pencatatan manual memiliki tingkat human-error pembukuan mencapai 15-25% dan 
+     memicu penurunan retensi pelanggan akibat miskomunikasi status layanan.
+
+
+2. JENIS GAP PENELITIAN & ALASANNYA:
+--------------------------------------------------------------------------------
+- Jenis Gap Terpilih: 
+  METHODOLOGICAL GAP (Kesenjangan Metodologis & Teknologi Implementasi)
+  didukung EVIDENCE GAP (Kesenjangan Bukti Empiris).
+
+- Alasan / Mengapa:
+  Sebagian besar penelitian sistem informasi laundry terdahulu hanya berfokus pada 
+  aplikasi web statis desktop lokal di satu komputer kasir tanpa sinkronisasi 
+  lintas-platform (*cross-platform*). Belum ada pendekatan metodologis yang 
+  mengintegrasikan sistem kasir mobile (Flutter) dengan database cloud real-time 
+  (Supabase), alur kerja visual Kanban 6-tahap (Baru Masuk -> Dicuci -> Dikeringkan 
+  -> Disetrika -> Siap Diambil -> Selesai), kalkulator POS uang kembalian, cetak 
+  struk thermal, serta otomasi reminder WhatsApp langsung ke pelanggan dalam 
+  satu ekosistem utuh.
+
+
+3. SATU PERTANYAAN PENELITIAN (RESEARCH QUESTION):
+--------------------------------------------------------------------------------
+"Bagaimana merancang dan mengimplementasikan sistem informasi manajemen kasir POS 
+ dan alur kerja cucian berbasis web dan mobile (Flutter) yang terintegrasi secara 
+ real-time dengan basis data cloud Supabase untuk meningkatkan efisiensi transaksi 
+ dan transparansi status pakaian pada UMKM laundry?"
+
+
+4. SATU TUJUAN PENELITIAN (KATA KERJA + HASIL TERUKUR):
+--------------------------------------------------------------------------------
+"Mengembangkan dan menguji sistem informasi manajemen laundry (LaundryKu) berbasis 
+ web dan mobile Flutter terintegrasi Supabase yang mampu mempercepat durasi 
+ pencatatan transaksi kasir minimal 50% dan memangkas tingkat ketidakpastian 
+ informasi status cucian pelanggan hingga 100% melalui pelacakan real-time."
+
+
+5. DAMPAK PENELITIAN (SIAPA YANG DIUNTUNGKAN & DIUKUR DENGAN APA):
+--------------------------------------------------------------------------------
+- Pihak yang Diuntungkan:
+  1. Pemilik & Kasir Laundry (Internal UMKM):
+     Proses input transaksi kasir menjadi otomatis, kalkulasi pembayaran (lunas/DP/
+     kembalian) presisi, pencetakan struk instan, dan pelaporan omzet harian 
+     tersinkronisasi secara otomatis tanpa selisih pembukuan.
+  2. Pelanggan Laundry (Eksternal):
+     Mendapatkan kepastian status pengerjaan pakaian secara transparan dan 
+     menerima notifikasi otomatis saat cucian siap diambil tanpa perlu menelepon kasir.
+
+- Parameter & Alat Ukur Keberhasilan:
+  1. Efisiensi Waktu Operasional:
+     Diukur dari durasi waktu rata-rata (Time-to-Complete Task dalam detik/menit) 
+     yang dibutuhkan kasir untuk memproses 1 transaksi baru sebelum dan sesudah 
+     sistem diterapkan.
+  2. Akurasi & Integritas Data Keuangan:
+     Diukur dari tingkat deviasi/selisih antara kas fisik dengan laporan omzet 
+     sistem (target deviasi = 0%).
+  3. Kualitas & Kebergunaan Sistem (Usability):
+     Diukur menggunakan kuesioner baku System Usability Scale (SUS) kepada kasir 
+     dan pelanggan dengan target nilai skor minimal > 75 (Kategori 'Acceptable / Good').
+================================================================================

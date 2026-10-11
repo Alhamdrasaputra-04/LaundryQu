@@ -2,6 +2,8 @@
    dashboard.js — LaundryKu Dashboard Logic
    ============================================================ */
 
+const esc = typeof escapeHtml === 'function' ? escapeHtml : (s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '');
+
 // ============================================================
 // DEFAULT DUMMY DATA (Initial Seed & Offline Fallback)
 // ============================================================
@@ -127,7 +129,7 @@ function initUserProfile() {
         if (nameEl) nameEl.textContent = user.nama || user.email;
         if (roleEl) roleEl.textContent = user.role === 'admin' ? 'Administrator' : 'Pelanggan / Pengguna';
         if (avatarEl) avatarEl.textContent = (user.nama ? user.nama.charAt(0) : 'U').toUpperCase();
-        if (welcomeEl) welcomeEl.innerHTML = `Selamat Datang, ${user.nama || 'Pengguna'}! &#128075;`;
+        if (welcomeEl) welcomeEl.innerHTML = `Selamat Datang, ${esc(user.nama || 'Pengguna')}! &#128075;`;
     }
 }
 
@@ -265,18 +267,19 @@ function renderAttentionList() {
             noteText = 'Tahap akhir penyelesaian';
         }
 
+        const safeId = esc(trx.id);
         return `
             <div class="attention-item ${levelClass}">
                 <div class="attention-status-bar"></div>
                 <div class="attention-info">
-                    <div class="attention-name">${trx.pelanggan}</div>
-                    <div class="attention-code">#${trx.id} &bull; ${trx.layanan}</div>
+                    <div class="attention-name">${esc(trx.pelanggan)}</div>
+                    <div class="attention-code">#${safeId} &bull; ${esc(trx.layanan)}</div>
                     <div class="attention-meta">
-                        <span class="badge ${badgeClass}">${trx.statusCucian}</span>
-                        <span class="attention-time">${noteText}</span>
+                        <span class="badge ${badgeClass}">${esc(trx.statusCucian)}</span>
+                        <span class="attention-time">${esc(noteText)}</span>
                     </div>
                 </div>
-                <button class="attention-action" aria-label="Lihat detail #${trx.id}" onclick="viewDetail('${trx.id}')">
+                <button class="attention-action" aria-label="Lihat detail #${safeId}" onclick="viewDetail('${safeId}')">
                     <svg viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/></svg>
                 </button>
             </div>
@@ -454,21 +457,21 @@ function renderTransactions(data) {
 
     tbody.innerHTML = data.map(trx => `
         <tr>
-            <td><span class="trx-id">#${trx.id}</span></td>
-            <td><span class="pelanggan-cell">${trx.pelanggan}</span></td>
-            <td>${trx.layanan}</td>
+            <td><span class="trx-id">#${esc(trx.id)}</span></td>
+            <td><span class="pelanggan-cell">${esc(trx.pelanggan)}</span></td>
+            <td>${esc(trx.layanan)}</td>
             <td><span class="total-cell">Rp ${(Number(trx.total) || 0).toLocaleString('id-ID')}</span></td>
-            <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${trx.statusCucian}</span></td>
-            <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span></td>
+            <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${esc(trx.statusCucian)}</span></td>
+            <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${esc(trx.pembayaran)}</span></td>
             <td>
                 <div class="action-btns">
-                    <button class="action-btn view" title="Lihat Detail & Tracking" onclick="viewDetail('${trx.id}')">
+                    <button class="action-btn view" title="Lihat Detail & Tracking" onclick="viewDetail('${esc(trx.id)}')">
                         <svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
                     </button>
-                    <button class="action-btn edit" title="Ubah Status Cucian & Bayar" onclick="editStatus('${trx.id}')">
+                    <button class="action-btn edit" title="Ubah Status Cucian & Bayar" onclick="editStatus('${esc(trx.id)}')">
                         <svg viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
                     </button>
-                    <button class="action-btn delete" title="Hapus Transaksi" onclick="deleteTransaction('${trx.id}')">
+                    <button class="action-btn delete" title="Hapus Transaksi" onclick="deleteTransaction('${esc(trx.id)}')">
                         <svg viewBox="0 0 24 24"><path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z"/></svg>
                     </button>
                 </div>
@@ -855,15 +858,18 @@ function updateLiveNotifications() {
         notifDot.style.display = unreadCount > 0 ? 'block' : 'none';
     }
 
-    notifList.innerHTML = notifs.slice(0, 8).map(n => `
-        <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="viewDetail('${n.id}')" style="cursor:pointer;" title="Klik untuk lihat detail transaksi #${n.id}">
+    notifList.innerHTML = notifs.slice(0, 8).map(n => {
+        const safeId = esc(n.id);
+        return `
+        <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="viewDetail('${safeId}')" style="cursor:pointer;" title="Klik untuk lihat detail transaksi #${safeId}">
             <div class="notif-icon ${n.color}">${n.icon}</div>
             <div class="notif-body">
-                <div class="notif-title">${n.title}</div>
-                <div class="notif-time">${n.time}</div>
+                <div class="notif-title">${esc(n.title)}</div>
+                <div class="notif-time">${esc(n.time)}</div>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function initNotifications() {

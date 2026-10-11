@@ -7,6 +7,24 @@ const SUPABASE_CONFIG = {
     key: 'sb_publishable_jnc8yj2Tpd02uMOM8Gybxg_gBOPPu61'
 };
 
+/**
+ * Global HTML Entity Sanitizer to prevent Stored & Reflected XSS
+ * @param {string|number|null|undefined} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+if (typeof window !== 'undefined') {
+    window.escapeHtml = escapeHtml;
+}
+
 // Inisialisasi Supabase Client jika SDK tersedia
 let sbClient = null;
 if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
@@ -57,8 +75,8 @@ const LaundryDB = {
                             tanggal: item.tanggal_masuk,
                             estimasi: item.estimasi_selesai,
                             catatan: item.catatan || '-',
-                            metodeBayar: localItem.metodeBayar || (item.status_pembayaran === 'Lunas' ? 'Tunai' : '-'),
-                            nominalDP: localItem.nominalDP || 0,
+                            metodeBayar: item.metode_pembayaran || localItem.metodeBayar || (item.status_pembayaran === 'Lunas' ? 'Tunai' : '-'),
+                            nominalDP: (item.nominal_dp !== null && item.nominal_dp !== undefined) ? parseFloat(item.nominal_dp) : (localItem.nominalDP || 0),
                             cashReceived: localItem.cashReceived || 0,
                             kembalian: localItem.kembalian || 0
                         };
@@ -98,7 +116,9 @@ const LaundryDB = {
                     status_pembayaran: trx.pembayaran || 'Belum',
                     tanggal_masuk: trx.tanggal || new Date().toISOString().split('T')[0],
                     estimasi_selesai: trx.estimasi || new Date(Date.now() + 86400000).toISOString().split('T')[0],
-                    catatan: trx.catatan || ''
+                    catatan: trx.catatan || '',
+                    metode_pembayaran: trx.metodeBayar || 'Tunai',
+                    nominal_dp: trx.nominalDP ? parseFloat(trx.nominalDP) : 0
                 };
 
                 if (trx.pelangganId && !isNaN(Number(trx.pelangganId))) {
@@ -142,6 +162,10 @@ const LaundryDB = {
                 if (newStatus) updatePayload.status_cucian = newStatus;
                 if (newPayment) updatePayload.status_pembayaran = newPayment;
                 if (newStatus === 'Selesai') updatePayload.tanggal_selesai = new Date().toISOString().split('T')[0];
+                if (extraMeta && extraMeta.metodeBayar) updatePayload.metode_pembayaran = extraMeta.metodeBayar;
+                if (extraMeta && extraMeta.nominalDP !== undefined && extraMeta.nominalDP !== null) {
+                    updatePayload.nominal_dp = parseFloat(extraMeta.nominalDP) || 0;
+                }
 
                 const { data, error } = await sbClient
                     .from('transaksi')
@@ -769,26 +793,125 @@ const LaundryAuth = {
         } catch(e){}
     },
 
-    // Perbarui Password Pengguna
-    async updatePassword(email, newPassword) {
+    // 5. Verifikasi Keberadaan Akun untuk Lupa Password
+    async verifyAccount(emailOrUsername) {
+        const identifier = (emailOrUsername || '').toLowerCase().trim();
+        if (!identifier) {
+            return { exists: false, message: 'Harap masukkan alamat email atau username Anda.' };
+        }
+
+        // Akun Cepat Demo
+        if (identifier === 'demo') {
+            return {
+                exists: true,
+                isDemo: true,
+                user: {
+                    nama: 'Demo Admin (Akun Uji Coba)',
+                    email: 'demo',
+                    role: 'admin'
+                },
+                message: 'Akun Demo terdeteksi. Kata sandi akun demo adalah "demo". Anda dapat langsung masuk tanpa mereset.'
+            };
+        }
+
+        // 1. Cek ke Supabase Cloud
         if (sbClient) {
             try {
-                await sbClient
+                const { data: user, error } = await sbClient
                     .from('profiles')
-                    .update({ password: newPassword })
-                    .eq('email', email);
-            } catch(e) {
-                console.warn('Supabase update password error:', e.message);
+                    .select('id, nama, email, role')
+                    .eq('email', identifier)
+                    .maybeSingle();
+
+                if (!error && user) {
+                    return {
+                        exists: true,
+                        isDemo: false,
+                        user: {
+                            id: user.id,
+                            nama: user.nama || 'Pengguna LaundryKu',
+                            email: user.email,
+                            role: user.role || 'user'
+                        }
+                    };
+                }
+            } catch (err) {
+                console.warn('Supabase verify account warning:', err.message);
             }
         }
+
+        // 2. Cek ke Local Storage Backup
+        const localUsers = LaundryAuth.getLocalUsers();
+        const localUser = localUsers.find(u => (u.email || '').toLowerCase() === identifier);
+        if (localUser) {
+            return {
+                exists: true,
+                isDemo: false,
+                user: {
+                    nama: localUser.nama || 'Pengguna LaundryKu',
+                    email: localUser.email,
+                    role: localUser.role || 'user'
+                }
+            };
+        }
+
+        return {
+            exists: false,
+            message: 'Email atau username tidak ditemukan dalam sistem LaundryKu. Pastikan Anda telah terdaftar.'
+        };
+    },
+
+    // 6. Perbarui & Reset Password Pengguna (Cloud + Local)
+    async updatePassword(email, newPassword) {
+        return await LaundryAuth.resetPassword(email, newPassword);
+    },
+
+    async resetPassword(email, newPassword) {
+        const cleanEmail = (email || '').toLowerCase().trim();
+        if (!cleanEmail) {
+            return { success: false, message: 'Alamat email wajib diisi.' };
+        }
+        if (!newPassword || newPassword.length < 6) {
+            return { success: false, message: 'Kata sandi baru minimal harus 6 karakter.' };
+        }
+        if (cleanEmail === 'demo') {
+            return { success: false, message: 'Kata sandi untuk akun demo bersifat tetap (demo) dan tidak dapat diubah.' };
+        }
+
+        let updatedInCloud = false;
+        if (sbClient) {
+            try {
+                const { error } = await sbClient
+                    .from('profiles')
+                    .update({ password: newPassword })
+                    .eq('email', cleanEmail);
+                if (!error) {
+                    updatedInCloud = true;
+                    console.log('✅ Password Supabase berhasil direset untuk:', cleanEmail);
+                } else {
+                    console.warn('Supabase update password notice:', error.message);
+                }
+            } catch(e) {
+                console.warn('Supabase update password exception:', e.message);
+            }
+        }
+
         try {
             const regUsers = LaundryAuth.getLocalUsers();
-            const idx = regUsers.findIndex(u => u.email === email);
+            const idx = regUsers.findIndex(u => (u.email || '').toLowerCase() === cleanEmail);
             if (idx !== -1) {
                 regUsers[idx].password = newPassword;
                 localStorage.setItem('laundry_registered_users', JSON.stringify(regUsers));
+            } else if (updatedInCloud) {
+                regUsers.push({ nama: 'Pengguna', email: cleanEmail, password: newPassword, role: 'user' });
+                localStorage.setItem('laundry_registered_users', JSON.stringify(regUsers));
             }
         } catch(e){}
+
+        return {
+            success: true,
+            message: 'Kata sandi berhasil diperbarui! Silakan masuk dengan kata sandi baru Anda.'
+        };
     },
 
     // 5. Auth Guard & Role Verification
@@ -811,6 +934,11 @@ const LaundryAuth = {
         return user;
     }
 };
-
-window.LaundryDB = LaundryDB;
-window.LaundryAuth = LaundryAuth;
+if (typeof window !== 'undefined') {
+    window.LaundryDB = LaundryDB;
+    window.LaundryAuth = LaundryAuth;
+    window.escapeHtml = escapeHtml;
+}
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { escapeHtml, LaundryDB, LaundryAuth, SUPABASE_CONFIG };
+}

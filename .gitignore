@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing and local storage
+coverage/
+.superpowers/
+.system_generated/
+
+# Flutter Mobile build & local files
+laundryku_mobile/.dart_tool/
+laundryku_mobile/build/
+laundryku_mobile/.flutter-plugins
+laundryku_mobile/.flutter-plugins-dependencies
+
+# Vercel
+.vercel/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+.idea/
+.vscode/

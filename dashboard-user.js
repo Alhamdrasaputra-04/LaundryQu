@@ -26,6 +26,8 @@ const BAYAR_BADGE = {
     'Belum': 'badge-belum',
 };
 
+const esc = typeof escapeHtml === 'function' ? escapeHtml : (s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '');
+
 let currentUser = null;
 let allTransactions = [];
 let myTransactions = [];
@@ -155,16 +157,25 @@ async function loadUserTransactions() {
         allTransactions = [];
     }
 
-    // Filter hanya transaksi milik user yang sedang aktif login
+    // Filter hanya transaksi milik user yang sedang aktif login (Isolasi data ketat)
     const myName = (currentUser.nama || '').toLowerCase().trim();
-    const myEmail = (currentUser.email || '').toLowerCase().trim();
+    const myPhone = (currentUser.nomor_telepon || '').replace(/\D/g, '');
 
     myTransactions = allTransactions.filter(t => {
-        const matchName = t.pelanggan && t.pelanggan.toLowerCase().trim() === myName;
-        const matchUser = t.user_id && currentUser.id && t.user_id === currentUser.id;
-        // Khusus pengujian demo budi
-        const isBudiDemo = myEmail.includes('budi') && t.pelanggan && t.pelanggan.toLowerCase().includes('budi');
-        return matchName || matchUser || isBudiDemo;
+        // 1. Primary: kecocokan user_id profil (UUID)
+        if (t.user_id && currentUser.id && String(t.user_id) === String(currentUser.id)) {
+            return true;
+        }
+        // 2. Secondary: kecocokan nomor telepon valid (minimal 8 digit)
+        const trxPhone = (t.telepon || '').replace(/\D/g, '');
+        if (myPhone && trxPhone && myPhone.length >= 8 && myPhone === trxPhone) {
+            return true;
+        }
+        // 3. Fallback: kecocokan nama lengkap pelanggan (exact match, case-insensitive)
+        if (myName && t.pelanggan && t.pelanggan.toLowerCase().trim() === myName) {
+            return true;
+        }
+        return false;
     });
 
     // Jika akun baru belum memiliki riwayat, gunakan data relevan atau fallback bersih
@@ -336,20 +347,22 @@ function renderOrdersTable(data) {
     }
 
     tbody.innerHTML = data.map(trx => {
+        const safeId = esc(trx.id);
+        const safeLayanan = esc(trx.layanan);
         return `
             <tr>
-                <td><b style="color:var(--navy);font-size:13.5px;">#${trx.id}</b></td>
-                <td>${trx.tanggal || '-'}</td>
-                <td>${trx.estimasi || '-'}</td>
+                <td><b style="color:var(--navy);font-size:13.5px;">#${safeId}</b></td>
+                <td>${esc(trx.tanggal || '-')}</td>
+                <td>${esc(trx.estimasi || '-')}</td>
                 <td>
-                    <div style="font-weight:600;color:var(--text-1);">${trx.layanan}</div>
-                    <div style="font-size:11.5px;color:var(--text-3);">${trx.berat || 1} kg/pcs</div>
+                    <div style="font-weight:600;color:var(--text-1);">${safeLayanan}</div>
+                    <div style="font-size:11.5px;color:var(--text-3);">${Number(trx.berat) || 1} kg/pcs</div>
                 </td>
                 <td><b style="color:var(--primary);font-size:13.5px;">Rp ${(Number(trx.total)||0).toLocaleString('id-ID')}</b></td>
-                <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span></td>
-                <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${trx.statusCucian}</span></td>
+                <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${esc(trx.pembayaran)}</span></td>
+                <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${esc(trx.statusCucian)}</span></td>
                 <td style="text-align:right;">
-                    <button type="button" class="btn-view-receipt" onclick="openUserReceipt('${trx.id}')">
+                    <button type="button" class="btn-view-receipt" onclick="openUserReceipt('${safeId}')">
                         <svg style="width:13px;height:13px;fill:currentColor;" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M16,18H8V16H16V18M16,14H8V12H16V14M13,9V3.5L18.5,9H13Z"/></svg>
                         <span>Struk</span>
                     </button>
@@ -452,23 +465,23 @@ async function openUserReceipt(id) {
         </div>
         <div class="receipt-line">
             <span>No. Nota:</span>
-            <b style="font-size:13px;">#${trx.id}</b>
+            <b style="font-size:13px;">#${esc(trx.id)}</b>
         </div>
         <div class="receipt-line">
             <span>Waktu Cetak:</span>
-            <span>${nowStr}</span>
+            <span>${esc(nowStr)}</span>
         </div>
         <div class="receipt-line">
             <span>Nama Pelanggan:</span>
-            <b>${trx.pelanggan}</b>
+            <b>${esc(trx.pelanggan)}</b>
         </div>
         <div class="receipt-line">
             <span>No. Telepon:</span>
-            <span>${trx.telepon || '-'}</span>
+            <span>${esc(trx.telepon || '-')}</span>
         </div>
         <hr style="border:none; border-top:1px dashed #CBD5E1; margin:8px 0;">
         <div class="receipt-line">
-            <span>${trx.layanan} (${trx.berat || 1} kg/pcs)</span>
+            <span>${esc(trx.layanan)} (${Number(trx.berat) || 1} kg/pcs)</span>
             <span>Rp ${totalVal.toLocaleString('id-ID')}</span>
         </div>
         <div class="receipt-total-line">
@@ -477,7 +490,7 @@ async function openUserReceipt(id) {
         </div>
         <div class="receipt-line" style="margin-top:6px;">
             <span>Metode Bayar:</span>
-            <b>${trx.metodeBayar || (isLunas ? 'Tunai' : 'Belum Bayar')}</b>
+            <b>${esc(trx.metodeBayar || (isLunas ? 'Tunai' : 'Belum Bayar'))}</b>
         </div>
         <div class="receipt-line" style="margin-top:4px;">
             <span>STATUS PEMBAYARAN:</span>
@@ -487,7 +500,7 @@ async function openUserReceipt(id) {
         </div>
         <div class="receipt-line" style="margin-top:4px;">
             <span>STATUS PENGERJAAN:</span>
-            <b style="color:#0284C7;">${trx.statusCucian}</b>
+            <b style="color:#0284C7;">${esc(trx.statusCucian)}</b>
         </div>
         <div class="receipt-footer">
             <div>${outlet.footer || 'Terima kasih atas kepercayaannya!'}</div>

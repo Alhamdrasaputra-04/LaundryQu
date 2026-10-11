@@ -1,0 +1,62 @@
+name: CI / Production Quality Gate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  web-test:
+    name: Web Testing & Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Syntax Check All JS Files
+        run: |
+          node -c supabaseClient.js
+          node -c dashboard.js
+          node -c dashboard-user.js
+          node -c transaksi.js
+          node -c cucian.js
+          node -c pembayaran.js
+          node -c script.js
+          node -c login.js
+
+      - name: Run Web Unit Tests
+        run: npm test
+
+  flutter-test:
+    name: Flutter Mobile Verification
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: laundryku_mobile
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Run Flutter Tests
+        run: flutter test

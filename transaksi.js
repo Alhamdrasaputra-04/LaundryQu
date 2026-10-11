@@ -2,6 +2,8 @@
    transaksi.js — Logika Manajemen Transaksi LaundryKu
    ============================================================ */
 
+const esc = typeof escapeHtml === 'function' ? escapeHtml : (s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '');
+
 let allTransactions = [];
 let filteredTransactions = [];
 let allCustomers = [];
@@ -224,38 +226,38 @@ function renderTransactions(data) {
 
         return `
             <tr>
-                <td><span class="trx-id">#${trx.id}</span></td>
+                <td><span class="trx-id">#${esc(trx.id)}</span></td>
                 <td>
                     <div>
-                        <div class="date-cell-main">${trx.tanggal || '-'}</div>
-                        <div class="date-cell-sub">Est: ${trx.estimasi || '-'}</div>
+                        <div class="date-cell-main">${esc(trx.tanggal || '-')}</div>
+                        <div class="date-cell-sub">Est: ${esc(trx.estimasi || '-')}</div>
                     </div>
                 </td>
                 <td>
                     <div>
-                        <div class="pelanggan-cell">${trx.pelanggan}</div>
-                        <div style="font-size:11.5px;color:var(--text-3);">${trx.telepon || '-'}</div>
+                        <div class="pelanggan-cell">${esc(trx.pelanggan)}</div>
+                        <div style="font-size:11.5px;color:var(--text-3);">${esc(trx.telepon || '-')}</div>
                     </div>
                 </td>
                 <td>
                     <div>
-                        <span style="font-weight:600;">${trx.layanan}</span>
-                        <div style="font-size:11.5px;color:var(--text-3);">${trx.berat || 1} kg/pcs</div>
+                        <span style="font-weight:600;">${esc(trx.layanan)}</span>
+                        <div style="font-size:11.5px;color:var(--text-3);">${Number(trx.berat) || 1} kg/pcs</div>
                     </div>
                 </td>
                 <td><span class="total-cell">Rp ${(Number(trx.total) || 0).toLocaleString('id-ID')}</span></td>
-                <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${trx.statusCucian}</span></td>
-                <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span></td>
+                <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${esc(trx.statusCucian)}</span></td>
+                <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${esc(trx.pembayaran)}</span></td>
                 <td style="text-align:right;">
                     <div class="action-btns" style="justify-content:flex-end;">
                         ${waBtnHtml}
-                        <button class="action-btn view" title="Lihat Detail & Tracking" onclick="viewDetail('${trx.id}')">
+                        <button class="action-btn view" title="Lihat Detail & Tracking" onclick="viewDetail('${esc(trx.id)}')">
                             <svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
                         </button>
-                        <button class="action-btn edit" title="Ubah Status Cucian & Bayar" onclick="editStatus('${trx.id}')">
+                        <button class="action-btn edit" title="Ubah Status Cucian & Bayar" onclick="editStatus('${esc(trx.id)}')">
                             <svg viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
                         </button>
-                        <button class="action-btn delete" title="Hapus Transaksi" onclick="deleteTransaction('${trx.id}')">
+                        <button class="action-btn delete" title="Hapus Transaksi" onclick="deleteTransaction('${esc(trx.id)}')">
                             <svg viewBox="0 0 24 24"><path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z"/></svg>
                         </button>
                     </div>
@@ -465,8 +467,9 @@ function initModals() {
         const custId = selectedCustOpt ? selectedCustOpt.dataset.id : null;
 
         const total = Math.round(harga * berat);
-        const randomNum = Math.floor(Math.random() * 899 + 100);
-        const newId = 'TRX00' + (allTransactions.length + 130 + randomNum % 50);
+        const datePrefix = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+        const entropy = Math.floor(1000 + Math.random() * 9000);
+        const newId = `TRX${datePrefix}${entropy}`;
 
         const newTrx = {
             id: newId,

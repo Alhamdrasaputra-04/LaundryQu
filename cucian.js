@@ -2,6 +2,8 @@
    cucian.js — Alur Pengerjaan Cucian (Kanban Workflow Board)
    ============================================================ */
 
+const esc = typeof escapeHtml === 'function' ? escapeHtml : (s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '');
+
 const STAGES = [
     { key: 'Baru Masuk',   next: 'Dicuci',       nextLabel: 'Mulai Cuci ➔',       colId: 'col-Baru-Masuk',   countId: 'count-Baru-Masuk' },
     { key: 'Dicuci',       next: 'Dikeringkan',  nextLabel: 'Mulai Keringkan ➔',  colId: 'col-Dicuci',       countId: 'count-Dicuci' },
@@ -131,26 +133,27 @@ function renderKanban(data) {
 
             // Tampilan Khusus Card Selesai
             if (isCompleted) {
+                const safeId = esc(trx.id);
                 return `
-                    <div class="kanban-card ${cardStageClass}" id="card-${trx.id}">
+                    <div class="kanban-card ${cardStageClass}" id="card-${safeId}">
                         <div class="card-top">
-                            <span class="card-trx-id">#${trx.id}</span>
-                            <span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span>
+                            <span class="card-trx-id">#${safeId}</span>
+                            <span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${esc(trx.pembayaran)}</span>
                         </div>
-                        <div class="card-cust-name" title="${trx.pelanggan}">${trx.pelanggan}</div>
+                        <div class="card-cust-name" title="${esc(trx.pelanggan)}">${esc(trx.pelanggan)}</div>
                         <div class="card-service-meta">
-                            <span>${trx.layanan}</span> &bull; <b>${trx.berat} kg</b>
+                            <span>${esc(trx.layanan)}</span> &bull; <b>${Number(trx.berat) || 1} kg</b>
                         </div>
                         <div class="card-dates">
-                            <div>📅 Masuk: ${trx.tanggal || '-'}</div>
-                            <div>✅ Diambil: ${trx.estimasi || trx.tanggal || 'Selesai'}</div>
+                            <div>📅 Masuk: ${esc(trx.tanggal || '-')}</div>
+                            <div>✅ Diambil: ${esc(trx.estimasi || trx.tanggal || 'Selesai')}</div>
                         </div>
                         <div class="card-actions">
-                            <button class="btn-completed-detail" onclick="viewDetailKanban('${trx.id}')" title="Lihat Rincian & Nota">
+                            <button class="btn-completed-detail" onclick="viewDetailKanban('${safeId}')" title="Lihat Rincian & Nota">
                                 <svg style="width:14px;height:14px;fill:white;" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M16,18H8V16H16V18M16,14H8V12H16V14M13,9V3.5L18.5,9H13Z"/></svg>
                                 Rincian Transaksi
                             </button>
-                            <button class="btn-undo-stage" onclick="revertStage('${trx.id}', 'Siap Diambil')" title="Kembalikan ke Siap Diambil (Koreksi)">
+                            <button class="btn-undo-stage" onclick="revertStage('${safeId}', 'Siap Diambil')" title="Kembalikan ke Siap Diambil (Koreksi)">
                                 ↩
                             </button>
                         </div>
@@ -162,26 +165,27 @@ function renderKanban(data) {
             const isOverdue = trx.estimasi && trx.estimasi < todayStr;
             const overdueHtml = isOverdue ? `<span class="overdue">⚠️ Lewat Estimasi!</span>` : '';
 
+            const safeId = esc(trx.id);
             return `
-                <div class="kanban-card ${cardStageClass}" id="card-${trx.id}">
+                <div class="kanban-card ${cardStageClass}" id="card-${safeId}">
                     <div class="card-top">
-                        <span class="card-trx-id">#${trx.id}</span>
-                        <span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span>
+                        <span class="card-trx-id">#${safeId}</span>
+                        <span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${esc(trx.pembayaran)}</span>
                     </div>
-                    <div class="card-cust-name" title="${trx.pelanggan}">${trx.pelanggan}</div>
+                    <div class="card-cust-name" title="${esc(trx.pelanggan)}">${esc(trx.pelanggan)}</div>
                     <div class="card-service-meta">
-                        <span>${trx.layanan}</span> &bull; <b>${trx.berat} kg</b>
+                        <span>${esc(trx.layanan)}</span> &bull; <b>${Number(trx.berat) || 1} kg</b>
                     </div>
                     <div class="card-dates">
-                        <div>📅 Masuk: ${trx.tanggal || '-'}</div>
-                        <div>⏱️ Est: ${trx.estimasi || '-'} ${overdueHtml}</div>
+                        <div>📅 Masuk: ${esc(trx.tanggal || '-')}</div>
+                        <div>⏱️ Est: ${esc(trx.estimasi || '-')} ${overdueHtml}</div>
                     </div>
                     <div class="card-actions">
-                        <button class="btn-advance-stage" onclick="advanceStage('${trx.id}', '${stage.next}')" title="Pindahkan ke ${stage.next}">
+                        <button class="btn-advance-stage" onclick="advanceStage('${safeId}', '${stage.next}')" title="Pindahkan ke ${stage.next}">
                             ${stage.nextLabel}
                         </button>
                         ${waBtnHtml}
-                        <button class="btn-card-detail" onclick="viewDetailKanban('${trx.id}')" title="Lihat Timeline & Detail">
+                        <button class="btn-card-detail" onclick="viewDetailKanban('${safeId}')" title="Lihat Timeline & Detail">
                             <svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
                         </button>
                     </div>

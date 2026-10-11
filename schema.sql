@@ -91,6 +91,20 @@ create table if not exists public.pengaturan_outlet (
 );
 
 -- ============================================================
+-- 8. PERFORMANCE INDEXES
+-- ============================================================
+create index if not exists idx_transaksi_kode on public.transaksi(kode_transaksi);
+create index if not exists idx_transaksi_user_id on public.transaksi(user_id);
+create index if not exists idx_transaksi_pelanggan_id on public.transaksi(pelanggan_id);
+create index if not exists idx_transaksi_layanan_id on public.transaksi(layanan_id);
+create index if not exists idx_transaksi_status_cucian on public.transaksi(status_cucian);
+create index if not exists idx_transaksi_status_pembayaran on public.transaksi(status_pembayaran);
+create index if not exists idx_transaksi_tgl_masuk on public.transaksi(tanggal_masuk desc);
+create index if not exists idx_transaksi_user_status on public.transaksi(user_id, status_cucian);
+create index if not exists idx_riwayat_transaksi_id on public.riwayat_status(transaksi_id);
+create index if not exists idx_profiles_email on public.profiles(email);
+
+-- ============================================================
 -- ROW LEVEL SECURITY (RLS) & PUBLIC POLICIES
 -- ============================================================
 alter table public.profiles enable row level security;

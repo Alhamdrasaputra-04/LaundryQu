@@ -2,6 +2,8 @@
    pembayaran.js — Manajemen Kasir & Pembayaran LaundryKu
    ============================================================ */
 
+const esc = typeof escapeHtml === 'function' ? escapeHtml : (s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '');
+
 let allTransactions = [];
 let filteredTransactions = [];
 let currentSettleTrx = null;
@@ -185,40 +187,44 @@ function renderPaymentTable(data) {
         let actionBtnHtml = '';
         if (!isLunas) {
             actionBtnHtml = `
-                <button class="btn-pay-settle" onclick="openSettleModal('${trx.id}')" title="Buka Kasir Pelunasan">
+                <button class="btn-pay-settle" onclick="openSettleModal('${esc(trx.id)}')" title="Buka Kasir Pelunasan">
                     <svg style="width:13px;height:13px;fill:white;" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>
                     ${isDP ? 'Lunasi Sisa' : 'Bayar Kasir'}
                 </button>
             `;
         } else {
             actionBtnHtml = `
-                <button class="btn-pay-settle" style="background:#0284C7;" onclick="openSettleModal('${trx.id}')" title="Ubah / Periksa Metode Bayar">
+                <button class="btn-pay-settle" style="background:#0284C7;" onclick="openSettleModal('${esc(trx.id)}')" title="Ubah / Periksa Metode Bayar">
                     <svg style="width:12px;height:12px;fill:white;" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
                     Ubah
                 </button>
             `;
         }
 
+        const safeId = esc(trx.id);
+        const safePelanggan = esc(trx.pelanggan);
+        const safeLayanan = esc(trx.layanan);
+
         return `
             <tr>
-                <td><span class="trx-id">#${trx.id}</span></td>
-                <td>${trx.tanggal || '-'}</td>
+                <td><span class="trx-id">#${safeId}</span></td>
+                <td>${esc(trx.tanggal || '-')}</td>
                 <td>
-                    <div style="font-weight:600; color:var(--text-1);">${trx.pelanggan}</div>
-                    <div style="font-size:11.5px; color:var(--text-3);">${trx.telepon || '-'}</div>
+                    <div style="font-weight:600; color:var(--text-1);">${safePelanggan}</div>
+                    <div style="font-size:11.5px; color:var(--text-3);">${esc(trx.telepon || '-')}</div>
                 </td>
                 <td>
-                    <div style="font-weight:500;">${trx.layanan}</div>
-                    <div style="font-size:11.5px; color:var(--text-3);">${trx.berat || 1} kg/pcs</div>
+                    <div style="font-weight:500;">${safeLayanan}</div>
+                    <div style="font-size:11.5px; color:var(--text-3);">${Number(trx.berat) || 1} kg/pcs</div>
                 </td>
                 <td><span class="total-cell">Rp ${(Number(trx.total)||0).toLocaleString('id-ID')}</span></td>
                 <td>${methodBadgeHtml}</td>
-                <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${trx.pembayaran}</span></td>
-                <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${trx.statusCucian}</span></td>
+                <td><span class="badge ${BAYAR_BADGE[trx.pembayaran] || 'badge-belum'}">${esc(trx.pembayaran)}</span></td>
+                <td><span class="badge ${STATUS_BADGE[trx.statusCucian] || 'badge-new'}">${esc(trx.statusCucian)}</span></td>
                 <td style="text-align:right;">
                     <div class="pay-action-btns" style="justify-content:flex-end;">
                         ${actionBtnHtml}
-                        <button class="btn-pay-print" onclick="openReceipt('${trx.id}')" title="Cetak Struk Kwitansi">
+                        <button class="btn-pay-print" onclick="openReceipt('${safeId}')" title="Cetak Struk Kwitansi">
                             <svg viewBox="0 0 24 24"><path d="M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V15H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z"/></svg>
                         </button>
                         ${waBtnHtml}
